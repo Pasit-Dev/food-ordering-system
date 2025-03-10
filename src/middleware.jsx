@@ -36,14 +36,6 @@ async function orderMiddleware(req) {
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
 
-  // if (orderIdFromUrl) {
-  //   const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-  //   if (resposne.data.order_status != 'Not Paid' && resposne.data.status !== 404) {
-  //     return NextResponse.redirect(new URL('/404', req.nextUrl.origin))
-  //   } else {
-  //     return NextResponse.next()
-  //   }
-  // }
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
@@ -84,6 +76,7 @@ async function orderMiddleware(req) {
       nextUrl.searchParams.set('orderId', newOrderId);
       const responseWithNewOrderId = NextResponse.redirect(nextUrl);
       responseWithNewOrderId.cookies.set('orderId', newOrderId, {
+        expires: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000),
         sameSite: 'None',
         secure: true, // Make sure to use secure if SameSite is None
         path: '/', // Ensure the path is set correctly
@@ -172,6 +165,7 @@ async function orderMiddleware(req) {
           nextUrl.searchParams.set('orderId', newOrderId);
           const responseWithNewOrderId = NextResponse.redirect(nextUrl);
           responseWithNewOrderId.cookies.set('orderId', newOrderId, {
+            expires: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000),
             sameSite: 'None',
             secure: true, // Make sure to use secure if SameSite is None
             path: '/', // Ensure the path is set correctly
