@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const OrderEditModal = ({ order, isOpen, onClose }) => {
-  if (!order) return null;
-
-  const [updatedStatus, setUpdatedStatus] = useState(order.status);
-  const [paymentMethod, setPaymentMethod] = useState(order.payment_method || ''); // Default to existing payment method
+  const safeOrder = order || {};
+  const [updatedStatus, setUpdatedStatus] = useState(safeOrder.status);
+  const [paymentMethod, setPaymentMethod] = useState(safeOrder.payment_method || ''); // Default to existing payment method
   const [orderItems, setOrderItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusLoading, setStatusLoading] = useState(false);
