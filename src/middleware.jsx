@@ -161,8 +161,7 @@ async function orderMiddleware(req) {
           }
         } else {
           console.log("Table is Available, creating new order ID");
-          response.cookies.set('orderId', '', { expires: new Date(0) });
-        const newOrderId = nanoid(8);
+          const newOrderId = nanoid(8);
         const nextUrl = new URL(url);
         nextUrl.searchParams.set('orderId', newOrderId);
         const responseWithNewOrderId = NextResponse.redirect(nextUrl);
