@@ -25,7 +25,7 @@ async function orderMiddleware(req) {
     console.log('No orderId in URL, setting to default or empty value');
     orderIdFromUrl = '';
   } else {
-    console.log('Order ID from URL:', orderIdFromUrl);
+    console.log('Order ID from URL:', String(orderIdFromUrl));
   }
 
   
