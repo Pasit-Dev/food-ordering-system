@@ -1,12 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useOrderStore } from '@/app/store/useOrderStore';
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import axios from 'axios';
 
 export default function HistoryPage() {
-    const router = useRouter();
+    return (
+        <Suspense fallback={<div>Loading ...</div>}>
+            <HistoryContent/>
+        </Suspense>
+    )
+}
+
+function HistoryContent() {;
     const searchParams = useSearchParams();
     const orderId = searchParams.get('orderId') || '';
     
