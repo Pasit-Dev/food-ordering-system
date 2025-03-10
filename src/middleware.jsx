@@ -17,13 +17,17 @@ export async function middleware(req) {
 async function orderMiddleware(req) {
   console.log('Middleware for /order');
   const url = req.nextUrl;
-  const tableId = String(url.searchParams.get('tableId'));  
-  const storedOrderId = req.cookies.get('orderId');
-  const orderIdFromUrl = url.searchParams.has('orderId') ? url.searchParams.get('orderId') : null;
-
+  const tableId = String(url.searchParams.get('tableId'));
   
-console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
-
+  // Debugging the searchParams
+  console.log('URL Search Params:', url.searchParams);
+  
+  const orderIdFromUrl = url.searchParams.has('orderId') ? url.searchParams.get('orderId') : null;
+  
+  console.log("orderIdFromUrl: ", orderIdFromUrl);  // Debugging the orderId
+  
+  const storedOrderId = req.cookies.get('orderId');
+  
   console.log('Cookie store:', storedOrderId);
   console.log('Table id:', tableId);
   
