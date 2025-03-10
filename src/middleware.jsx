@@ -17,10 +17,11 @@ export async function middleware(req) {
 async function orderMiddleware(req) {
   console.log('Middleware for /order');
   const url = req.nextUrl;
-  const tableId = url.searchParams.get('tableId');
-  const orderIdFromUrl = url.searchParams.get('orderId');
+  const tableId = url.searchParams.get('tableId');  
   const storedOrderId = req.cookies.get('orderId');
+  const orderIdFromUrl = url.searchParams.get('orderId');
 
+  console.log("orderIdFromUrl: ", orderIdFromUrl);  // พิมพ์ค่าออกมาเพื่อเช็คว่าได้ค่าอะไร
   console.log('Cookie store:', storedOrderId);
   console.log('Table id:', tableId);
   
