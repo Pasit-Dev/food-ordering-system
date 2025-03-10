@@ -20,7 +20,7 @@ async function orderMiddleware(req) {
   const tableId = String(url.searchParams.get('tableId'));  
   const storedOrderId = req.cookies.get('orderId');
   const orderIdFromUrl = String(url.searchParams.get('orderId'));
-  console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
+console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
 
   console.log('Cookie store:', storedOrderId);
   console.log('Table id:', tableId);
@@ -30,6 +30,14 @@ async function orderMiddleware(req) {
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
 
+  // if (orderIdFromUrl) {
+  //   const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+  //   if (resposne.data.order_status != 'Not Paid' && resposne.data.status !== 404) {
+  //     return NextResponse.redirect(new URL('/404', req.nextUrl.origin))
+  //   } else {
+  //     return NextResponse.next()
+  //   }
+  // }
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
@@ -40,23 +48,23 @@ async function orderMiddleware(req) {
         return response;
       } else {
         if (orderIdFromUrl) {
-          console.log("1111");
+          console.log("1111")
           const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
           const orderStatus = resposne.data.order_status;
           if (orderStatus) {
-            console.log("2222");
+            console.log("2222")
             if (orderStatus === 'Paid' || orderStatus === 'Cancelled') {
-              console.log('3333');
+              console.log('3333')
               const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
               response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
               return response;
             } else {
-              console.log("4444");
-              return NextResponse.next();
+              console.log("4444")
+              return NextResponse.next()
             }
           } else {
-            console.log('5555');
-            return NextResponse.next();
+            console.log('5555')
+            return NextResponse.next()
           }
         } 
         const nextUrl = new URL(url);
@@ -88,33 +96,33 @@ async function orderMiddleware(req) {
       }
       
       if (tableStatus === 'Occupied') {
-        console.log('In Occupied');
+        console.log('In Occupied')
         if (orderIdFromUrl && orderIdFromUrl.trim() !== 'null' && orderIdFromUrl.trim() !== 'undefined') {
           // check order status 
           console.log("Order ID From Url ", typeof orderIdFromUrl);
           const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-          console.log("Resposne Order Status ", orderStatus.data);
-          if (orderStatus.data.status !== 404) {
-            if (orderStatus.data.order_status !== 'Not Paid') {
+          console.log("Resposne Order Status ", orderStatus.data)
+          if (orderStatus.data.status != 404) {
+            if (orderStatus.data.order_status != 'Not Paid') {
               // remove cookie order id 
               const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-              console.log("Remove order id in cookie");
+              console.log("Remove order id in cookie")
               response.cookies.delete('orderId');
               return response;
             } else {
               return NextResponse.next();
             }
           } else {
-            return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+            
           }
         } else {
           if (storedOrderId) {
             const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-            console.log("Order Resposne ", orderStatus);
-            console.log("Order Status ", orderStatus.data.order_status);
-            if (orderStatus.data.order_status !== 'Not Paid') {
+            console.log("Order Resposne ", orderStatus)
+            console.log("Order Status ", orderStatus.data.order_status)
+            if (orderStatus.data.order_status != 'Not Paid') {
               const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-              console.log("Delet order id in cookie");
+              console.log("Delet order id in cookie")
               response.cookies.delete('orderId');
               return response;
             } else {
@@ -124,18 +132,21 @@ async function orderMiddleware(req) {
               return responseWithNewOrderId;
             }
           } else {
-            return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
-          } 
+              
+          return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
+            } 
         } 
+        
+        
       }
       
       if (tableStatus === 'Available') {
-        console.log('In Available');
+        console.log('In Available')
         if (orderIdFromUrl) {
-          console.log("Have order id in URL");
+          console.log("Have order id in URL")
           const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-          if (orderStatus.data.status === 200) {
-            console.log("Order Status ", orderStatus.data.status);
+          if (orderStatus.data.status == 200) {
+            console.log("Order Status ", orderStatus.data.status)
             if (orderStatus.data.order_status !== 'Not Paid') {
               const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
               response.cookies.delete('orderId');
@@ -147,8 +158,9 @@ async function orderMiddleware(req) {
             console.log('Order Status ', orderStatus.data.status);
             return NextResponse.next();
           }
+          
         } else {
-          console.log("Haven't order id IN URL");
+          console.log("Haven't order id IN URL")
           const newOrderId = nanoid(8);
           const nextUrl = new URL(url);
           nextUrl.searchParams.set('orderId', newOrderId);
@@ -161,7 +173,7 @@ async function orderMiddleware(req) {
           return responseWithNewOrderId;
         }
       }
-      console.log("Error to 404");
+      console.log("Error ....")
       return NextResponse.redirect(new URL('/error', req.nextUrl.origin));
     } catch (err) {
       console.error(`Error fetching table status:`, err);
