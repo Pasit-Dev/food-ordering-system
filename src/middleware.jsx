@@ -68,7 +68,7 @@ async function orderMiddleware(req) {
       const nextUrl = new URL(url);
       nextUrl.searchParams.set('orderId', newOrderId);
       const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-      responseWithNewOrderId.cookies.set('orderId', newOrderId, { sameSite: 'None' });
+      responseWithNewOrderId.cookies.set('orderId', newOrderId);
       return responseWithNewOrderId; 
     }
   } else {
@@ -165,7 +165,7 @@ async function orderMiddleware(req) {
         const nextUrl = new URL(url);
         nextUrl.searchParams.set('orderId', newOrderId);
         const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-        responseWithNewOrderId.cookies.set('orderId', newOrderId, { sameSite: 'None'});
+        responseWithNewOrderId.cookies.set('orderId', newOrderId);
         return responseWithNewOrderId;
         }
         
