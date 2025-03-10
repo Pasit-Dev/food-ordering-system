@@ -19,7 +19,7 @@ async function orderMiddleware(req) {
   const url = req.nextUrl;
   const tableId = String(url.searchParams.get('tableId'));  
   const storedOrderId = req.cookies.get('orderId');
-  const orderIdFromUrl = url.searchParams.get('orderId') || null;
+  const orderIdFromUrl = url.searchParams.has('orderId') ? url.searchParams.get('orderId') : null;
 
   
 console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
