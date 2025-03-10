@@ -187,11 +187,12 @@ async function adminMiddleware(req) {
   console.log('Middleware for /admin');
   
   // Retrieve cookies from the headers using Next.js 'cookies' helper
-  const cookieStore = cookies();
-  const token = cookieStore.get('token');
-
+  const token = req.cookies.get('token');
   // Check if token is missing
   if (!token) {
+    if (req.nextUrl.pathname.startsWith('/admin/login')) {
+      return NextResponse.next();
+    }
     console.log('No token found, redirection to /admin/login');
     return NextResponse.redirect(new URL('/admin/login', req.nextUrl.origin));
   }
