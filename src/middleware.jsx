@@ -90,6 +90,7 @@ async function orderMiddleware(req) {
         console.log('In Occupied')
         if (orderIdFromUrl) {
           // check order status 
+          console.log("Order ID From Url ", orderIdFromUrl);
           const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
           console.log("Resposne Order Status ", orderStatus.data)
           if (orderStatus.data.order_status != 'Not Paid') {
