@@ -37,20 +37,20 @@ async function orderMiddleware(req) {
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
 
-  if (storedOrderId) {
-    const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-    if (response.data.status != 404) {
-      const { table_id, order_status } = response.data;
-    if (table_id == tableId && order_status === 'Not Paid') {
-      const nextUrl = new URL(url);
-      nextUrl.searchParams.set('orderId', storedOrderId.value);
-      const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-      return responseWithNewOrderId;
-    } else {
-      return NextResponse.redirect(new URL('/tableidnotmatch', req.nextUrl.origin));
-    }
-    }
-  }
+  // if (storedOrderId) {
+  //   const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+  //   if (response.data.status != 404) {
+  //     const { table_id, order_status } = response.data;
+  //   if (table_id == tableId && order_status === 'Not Paid') {
+  //     const nextUrl = new URL(url);
+  //     nextUrl.searchParams.set('orderId', storedOrderId.value);
+  //     const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+  //     return responseWithNewOrderId;
+  //   } else {
+  //     return NextResponse.redirect(new URL('/tableidnotmatch', req.nextUrl.origin));
+  //   }
+  //   }
+  // }
 
   if (tableId === 'takeaway') {
     if (storedOrderId) {
@@ -133,26 +133,29 @@ async function orderMiddleware(req) {
         } else {
           if (storedOrderId) {
             const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+            const { table_id, order_status } = orderStatus.data;
             console.log("Order Resposne ", orderStatus)
             console.log("Order Status ", orderStatus.data.order_status)
-            if (orderStatus.data.order_status != 'Not Paid') {
+            if (order_status != 'Not Paid') {
               const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
               console.log("Delet order id in cookie")
               response.cookies.delete('orderId');
               return response;
             } else {
-              const nextUrl = new URL(url);
-              nextUrl.searchParams.set('orderId', storedOrderId.value);
-              const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-              return responseWithNewOrderId;
+              // if (table_id == tableId) {
+              //   const nextUrl = new URL(url);
+              // nextUrl.searchParams.set('orderId', storedOrderId.value);
+              // const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+              // return responseWithNewOrderId;
+              // } else {
+              //   // clear cookie and create create new order id 
+              // }
             }
           } else {
               
           return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
             } 
         } 
-        
-        
       }
       
       if (tableStatus === 'Available') {
