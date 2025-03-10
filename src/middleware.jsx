@@ -19,8 +19,8 @@ async function orderMiddleware(req) {
   const url = req.nextUrl;
   const tableId = String(url.searchParams.get('tableId'));  
   const storedOrderId = req.cookies.get('orderId');
-  const orderIdFromUrl = String(url.searchParams.get('orderId'));
-console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
+  const orderIdFromUrl = url.searchParams.get('orderId');
+console.log("orderIdFromUrl (as string): ", String(orderIdFromUrl));
 
   console.log('Cookie store:', storedOrderId);
   console.log('Table id:', tableId);
@@ -97,41 +97,24 @@ console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
       
       if (tableStatus === 'Occupied') {
         console.log('In Occupied')
-        if (orderIdFromUrl && orderIdFromUrl.trim() !== 'null' && orderIdFromUrl.trim() !== 'undefined') {
+        console.log("Order Id from URL in occupied ", orderIdFromUrl, typeof orderIdFromUrl, String(orderIdFromUrl));
+        if (orderIdFromUrl) {
           // check order status 
           console.log("Order ID From Url ", typeof orderIdFromUrl);
-          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${String(orderIdFromUrl)}`);
           console.log("Resposne Order Status ", orderStatus.data)
           if (orderStatus.data.status != 404) {
             if (orderStatus.data.order_status != 'Not Paid') {
               // remove cookie order id 
               const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-              console.log("Remove order id in cookie")
+              // console.log("Remove order id in cookie")
               response.cookies.delete('orderId');
               return response;
             } else {
               return NextResponse.next();
             }
           } else {
-            if (storedOrderId) {
-              const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-              console.log("Order Resposne ", orderStatus)
-              console.log("Order Status ", orderStatus.data.order_status)
-              if (orderStatus.data.order_status != 'Not Paid') {
-                const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-                console.log("Delet order id in cookie")
-                response.cookies.delete('orderId');
-                return response;
-              } else {
-                const nextUrl = new URL(url);
-                nextUrl.searchParams.set('orderId', storedOrderId);
-                const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-                return responseWithNewOrderId;
-              }
-            } else {
-                
-            return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
-              }
+            
           }
         } else {
           if (storedOrderId) {
@@ -191,7 +174,7 @@ console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
           return responseWithNewOrderId;
         }
       }
-      console.log("Error to 404");
+      console.log("Error to 404")
       return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
     } catch (err) {
       console.error(`Error fetching table status:`, err);
