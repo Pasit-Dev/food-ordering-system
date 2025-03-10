@@ -28,6 +28,7 @@ async function orderMiddleware(req) {
     console.log('Redirection to 404 not found');
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
+  console.log('Stored Data: ', storedOrderId);
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
@@ -160,6 +161,7 @@ async function orderMiddleware(req) {
           }
         } else {
           console.log("Table is Available, creating new order ID");
+          response.cookies.set('orderId', '', { expires: new Date(0) });
         const newOrderId = nanoid(8);
         const nextUrl = new URL(url);
         nextUrl.searchParams.set('orderId', newOrderId);
