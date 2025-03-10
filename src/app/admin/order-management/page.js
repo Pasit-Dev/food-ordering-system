@@ -43,6 +43,7 @@ export default function OrdersPage() {
       if (!groupedOrders[item.order_id]) {
         groupedOrders[item.order_id] = {
           id: item.order_id,
+          customer_name: item.customer_name,
           tableNumber: item.table_number || 'Takeaway', // Adjust table number from the API
           orderDate: moment(item.order_date).format('YYYY-MM-DD'), // ใช้ moment.js เพื่อจัดการเวลา
           total: 0, // เริ่มต้น total เป็น 0
