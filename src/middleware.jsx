@@ -94,6 +94,7 @@ async function orderMiddleware(req) {
           if (orderStatus.data.order_status !== 'Not Paid') {
             // remove cookie order id 
             const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+            console.log("Remove order id in cookie")
             response.cookies.delete('orderId');
             return response;
           } else {
