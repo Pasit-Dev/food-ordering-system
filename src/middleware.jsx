@@ -122,7 +122,9 @@ async function orderMiddleware(req) {
                 response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
                 return response;
               } else {
-                return NextResponse.next();
+                const nextUrl = new URL(url);
+                nextUrl.searchParams.set('orderId', storedOrderId.value);
+                return NextResponse.redirect(nextUrl);
               }
             }
             
