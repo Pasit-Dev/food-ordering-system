@@ -63,11 +63,13 @@ async function orderMiddleware(req) {
     if (tableStatus === 'Occupied' || tableStatus === 'Available') {
       if (orderIdFromUrl) {
         const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-        if (orderStatus.data.order_status !== 'Not Paid') {
-          const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-          response.headers.set('Clear-OrderId', 'true'); // ให้ Client ลบ orderId
-          return response;
-        }
+        if (!orderStatus.data.status == 404) {
+          if (orderStatus.data.order_status !== 'Not Paid') {
+            const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+            response.headers.set('Clear-OrderId', 'true'); // ให้ Client ลบ orderId
+            return response;
+          }
+        }  
         return NextResponse.next();
       } else {
         console.log('Creating new order ID for dine-in');

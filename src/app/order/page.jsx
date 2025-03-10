@@ -54,7 +54,7 @@ function OrderContent() {
     }
   };
 
-  const filteredMenus = menus.filter((menu) => menu.menu_name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredMenus = Array.isArray(menus) ? menus.filter((menu) => menu.menu_name.toLowerCase().includes(searchQuery.toLowerCase())) : [];
 
   return (
     <div className="w-full pb-20 bg-gray-50 min-h-screen text-gray-800">
