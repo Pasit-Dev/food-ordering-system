@@ -112,6 +112,7 @@ async function orderMiddleware(req) {
             }
             
           } else {
+            console.log("not found cookie")
             return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
           }
         }
