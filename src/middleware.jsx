@@ -47,7 +47,7 @@ async function orderMiddleware(req) {
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
-      const orderRes = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId}`);
+      const orderRes = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
       if (orderRes.data.order_status === 'Paid' || orderRes.data.order_status === 'Cancelled') {
         const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
         response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
@@ -74,7 +74,7 @@ async function orderMiddleware(req) {
           }
         } 
         const nextUrl = new URL(url);
-        nextUrl.searchParams.set('orderId', storedOrderId);
+        nextUrl.searchParams.set('orderId', storedOrderId.value);
         return NextResponse.redirect(nextUrl);
       }
     } else {
@@ -133,7 +133,7 @@ async function orderMiddleware(req) {
               return response;
             } else {
               const nextUrl = new URL(url);
-              nextUrl.searchParams.set('orderId', storedOrderId);
+              nextUrl.searchParams.set('orderId', storedOrderId.value);
               const responseWithNewOrderId = NextResponse.redirect(nextUrl);
               return responseWithNewOrderId;
             }
