@@ -19,7 +19,7 @@ async function orderMiddleware(req) {
   const url = req.nextUrl;
   const tableId = String(url.searchParams.get('tableId'));  
   const storedOrderId = req.cookies.get('orderId');
-  const orderIdFromUrl = url.searchParams.get('orderId');
+  const orderIdFromUrl = String(url.searchParams.get('orderId'));
   console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
 
   console.log('Cookie store:', storedOrderId);
@@ -162,10 +162,10 @@ async function orderMiddleware(req) {
         }
       }
       console.log("Error to 404");
-      return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+      return NextResponse.redirect(new URL('/error', req.nextUrl.origin));
     } catch (err) {
       console.error(`Error fetching table status:`, err);
-      return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+      return NextResponse.redirect(new URL('/error', req.nextUrl.origin));
     }
   }
 }
