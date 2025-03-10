@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { nanoid } from 'nanoid';
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function middleware(req) {
@@ -37,20 +36,23 @@ async function orderMiddleware(req) {
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
 
-  // if (storedOrderId) {
-  //   const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-  //   if (response.data.status != 404) {
-  //     const { table_id, order_status } = response.data;
-  //   if (table_id == tableId && order_status === 'Not Paid') {
-  //     const nextUrl = new URL(url);
-  //     nextUrl.searchParams.set('orderId', storedOrderId.value);
-  //     const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-  //     return responseWithNewOrderId;
-  //   } else {
-  //     return NextResponse.redirect(new URL('/tableidnotmatch', req.nextUrl.origin));
-  //   }
-  //   }
-  // }
+  // if table_id ของ order_id ใน cookie ไม่ตรงกับ tableId ของ url ให้ 1.delete cookie 
+  // ถ้า table_id ของ order_id ใน cookie ไม่ตรงกับ tableId ของ URL → ลบคุกกี้
+if (storedOrderId) {
+  try {
+    const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+    if (response.data.status !== 404 && tableId !== response.data.table_id) {
+      console.log('Order ID in cookie does not match the current table. Removing cookie...');
+      const res = NextResponse.next();
+      res.cookies.delete('orderId'); // ✅ ลบคุกกี้
+      return res;
+    }
+  } catch (err) {
+    console.error('Error fetching order status:', err);
+  }
+}
+
+
 
   if (tableId === 'takeaway') {
     if (storedOrderId) {
