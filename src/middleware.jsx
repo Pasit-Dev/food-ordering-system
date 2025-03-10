@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { nanoid } from 'nanoid';
-import { parse } from 'next/dist/build/swc/generated-native';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function middleware(req) {
@@ -185,13 +185,15 @@ async function orderMiddleware(req) {
 
 async function adminMiddleware(req) {
   console.log('Middleware for /admin');
-  const cookie = parse(req.headers.get('cookie') || '');
+  
+  // Retrieve cookies from the headers using Next.js 'cookies' helper
+  const cookieStore = cookies();
+  const token = cookieStore.get('token');
 
-  const token = cookie.token;
-
+  // Check if token is missing
   if (!token) {
-    console.log('No token found, redirection to /admin/login')
-    return NextResponse.redirect(new URL('/admin/login', req.nextUrl.origin))
+    console.log('No token found, redirection to /admin/login');
+    return NextResponse.redirect(new URL('/admin/login', req.nextUrl.origin));
   }
 
   console.log("Token found, allowing access to /admin");
