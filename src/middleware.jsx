@@ -28,9 +28,6 @@ async function orderMiddleware(req) {
     console.log('Redirection to 404 not found');
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
-
-  
-
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
@@ -93,7 +90,25 @@ async function orderMiddleware(req) {
             response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
             return response;
           } else {
-            return NextResponse.next();
+            if (storedOrderId) {
+              const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+              console.log(`Order Status from cookie : ${orderStatus.data.order_status}`)
+              if (!orderStatus.data.order_status) {
+                return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
+              } else {
+                if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
+                  const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+                  response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
+                  return response;
+                } else {
+                  return NextResponse.next();
+                }
+              }
+              
+            } else {
+              console.log("not found cookie")
+              return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
+            }
           }
         } else {
           if (storedOrderId) {
