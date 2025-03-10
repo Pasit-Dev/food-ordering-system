@@ -19,7 +19,7 @@ export default function MenuPage() {
   useEffect(() => {
     // ดึงหมายเลขโต๊ะจาก API
     if (tableId && tableId !== "takeaway") {
-      fetch(`http://localhost:8080/tables/${tableId}`)
+      fetch(`https://api.pasitlab.com/tables/${tableId}`)
         .then((response) => response.json())
         .then((data) => {
           setTableNumber(data.table_number); // เก็บหมายเลขโต๊ะ

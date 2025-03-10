@@ -33,7 +33,7 @@ export default function HistoryPage() {
         if (!window.confirm("คุณต้องการยกเลิกรายการนี้หรือไม่?")) return;
 
         try {
-            const response = await axios.put(`http://localhost:8080/order-items/${orderItemId}/status`, {
+            const response = await axios.put(`https://api.pasitlab.com/order-items/${orderItemId}/status`, {
                 new_status: 'Cancelled',
                 user: 'customer',
                 change_reason: 'ผู้ใช้ยกเลิกคำสั่งซื้อ'

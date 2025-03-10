@@ -11,7 +11,7 @@ const OrderDetailModal = ({ order, isOpen, onClose }) => {
       const fetchOrderItems = async () => {
         try {
           setLoading(true);
-          const response = await axios.get(`http://localhost:8080/order-items/${order.id}`);
+          const response = await axios.get(`https://api.pasitlab.com/order-items/${order.id}`);
           setOrderItems(response.data.order_items);
           console.log(response.data.order_items)
           setLoading(false);

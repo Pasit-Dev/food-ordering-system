@@ -95,7 +95,7 @@ export default function CartPage() {
       alert("กรุณาเพิ่มรายการอาหารก่อนสั่ง");
       return;
     }
-    const checkName = await axios.get(`http://localhost:8080/orders/status/${orderId}`);
+    const checkName = await axios.get(`https://api.pasitlab.com/orders/status/${orderId}`);
     console.log("customer name ", checkName.data.customer)
     let customerName = '';
     if (!checkName.data.customer) {
@@ -126,7 +126,7 @@ export default function CartPage() {
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/orders', orderData, {
+      const response = await axios.post('https://api.pasitlab.com/orders', orderData, {
         headers: {
           'Content-Type': 'application/json',
         },

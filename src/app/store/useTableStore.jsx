@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/tables';
+const API_URL = 'https://api.pasitlab.com/tables';
 
 const useTableStore = create((set) => ({
   tables: [{

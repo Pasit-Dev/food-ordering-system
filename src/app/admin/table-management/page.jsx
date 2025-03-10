@@ -28,7 +28,7 @@ export default function TableManagementPage() {
   const handleAddTable = async (newTable) => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8080/tables', {
+      const response = await axios.post('https://api.pasitlab.com/tables', {
         table_number: newTable.table_number,
         table_status: newTable.table_status,
       });

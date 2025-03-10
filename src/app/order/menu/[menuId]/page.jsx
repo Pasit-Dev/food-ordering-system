@@ -30,7 +30,7 @@ export default function MenuDetail() {
 
     console.log("Menu ID:", menuId);
     axios
-      .get(`http://localhost:8080/menus/${menuId}`)
+      .get(`https://api.pasitlab.com/menus/${menuId}`)
       .then((response) => {
         const data = response.data;
         console.log(response.data);

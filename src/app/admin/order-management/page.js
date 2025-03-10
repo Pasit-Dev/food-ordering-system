@@ -26,7 +26,7 @@ export default function OrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/orders');
+      const response = await axios.get('https://api.pasitlab.com/orders');
       const data = response.data.orders;
       
       // ปรับวันที่ให้ตรงกับ Time Zone ที่คุณต้องการ

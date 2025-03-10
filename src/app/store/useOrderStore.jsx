@@ -10,7 +10,7 @@ export const useOrderStore = create((set, get) => ({
         set({ isLoading: true });
 
         try {
-            const response = await axios.get(`http://localhost:8080/order-items/${orderId}`);
+            const response = await axios.get(`https://api.pasitlab.com/order-items/${orderId}`);
             console.log("Response Data: ", response.data);
             if (response.data.order_items.length !== 0) {
                 if (JSON.stringify(get().orderItems) !== JSON.stringify(response.data.order_items)) {

@@ -15,7 +15,7 @@ export default function MenuManagement() {
   useEffect(() => {
     const fetchMenus = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/menus");
+        const response = await axios.get("https://api.pasitlab.com/menus");
         console.log("API Response:", response.data);
         setMenus(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
@@ -48,11 +48,11 @@ export default function MenuManagement() {
     try {
       let response;
       if (editingMenu) {
-        response = await axios.put(`http://localhost:8080/menus/${editingMenu.menu_id}`, menu);
+        response = await axios.put(`https://api.pasitlab.com/menus/${editingMenu.menu_id}`, menu);
         setMenus(menus.map(m => (m.menu_id === editingMenu.menu_id ? response.data.data : m)));
         showSnackbar("Menu updated successfully!", "success");
       } else {
-        response = await axios.post("http://localhost:8080/menus", menu);
+        response = await axios.post("https://api.pasitlab.com/menus", menu);
         setMenus([...menus, response.data.data]);
         showSnackbar("Menu added successfully!", "success");
       }
@@ -67,7 +67,7 @@ export default function MenuManagement() {
   const deleteMenu = async (menuId) => {
     if (!confirm("Are you sure you want to delete this menu?")) return;
     try {
-      const response = await axios.delete(`http://localhost:8080/menus/${menuId}`);
+      const response = await axios.delete(`https://api.pasitlab.com/menus/${menuId}`);
       if (response.status === 200) {
         setMenus(menus.filter(menu => menu.menu_id !== menuId));
         showSnackbar("Menu deleted successfully!", "success");

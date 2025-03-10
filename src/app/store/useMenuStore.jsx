@@ -9,7 +9,7 @@ const useMenuStore = create((set) => ({
   fetchMenus: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get("http://localhost:8080/menus");
+      const response = await axios.get("https://api.pasitlab.com/menus");
       set({ menus: response.data, loading: false });
     } catch (error) {
       set({ error: "โหลดเมนูไม่สำเร็จ", loading: false });

@@ -34,7 +34,7 @@ async function orderMiddleware(req) {
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
-      const orderRes = await axios.get(`http://localhost:8080/orders/status/${storedOrderId.value}`);
+      const orderRes = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
       if (orderRes.data.order_status === 'Paid' || orderRes.data.order_status === 'Cancelled') {
         const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
         response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
@@ -42,7 +42,7 @@ async function orderMiddleware(req) {
       } else {
         if (orderIdFromUrl) {
           console.log("1111")
-          const resposne = await axios.get(`http://localhost:8080/orders/status/${orderIdFromUrl}`);
+          const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
           const orderStatus = resposne.data.order_status;
           if (orderStatus) {
             console.log("2222")
@@ -75,7 +75,7 @@ async function orderMiddleware(req) {
     }
   } else {
     try {
-      const response = await axios.get(`http://localhost:8080/tables/${tableId}`);
+      const response = await axios.get(`https://api.pasitlab.com/tables/${tableId}`);
       const tableStatus = response.data.table_status;
 
       console.log(`Table Status: ${tableStatus}`);
@@ -86,7 +86,7 @@ async function orderMiddleware(req) {
 
       if (tableStatus === 'Occupied') {
         if (orderIdFromUrl) {
-          const orderStatus = await axios.get(`http://localhost:8080/orders/status/${orderIdFromUrl}`);
+          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
           console.log(`Order Status: ${orderStatus.data.order_status}`)
           if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
             const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
@@ -94,7 +94,7 @@ async function orderMiddleware(req) {
             return response;
           } else {
             if (storedOrderId) {
-              const orderStatus = await axios.get(`http://localhost:8080/orders/status/${storedOrderId.value}`);
+              const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
               console.log(`Order Status from cookie : ${orderStatus.data.order_status}`)
               if (!orderStatus.data.order_status) {
                 return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
@@ -117,14 +117,14 @@ async function orderMiddleware(req) {
 
       if (tableStatus === 'Available') {
         if (orderIdFromUrl) {
-          const orderStatus = await axios.get(`http://localhost:8080/orders/status/${orderIdFromUrl}`);
+          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
           if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
             const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
             response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
             return response;
           } else {
             // if (orderIdFromUrl === storedOrderId) {
-            //   const orderStatus = await axios.get(`http://localhost:8080/orders/status/${storedOrderId.value}`);
+            //   const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
             //   if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
             //     const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
             //     response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie

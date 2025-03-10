@@ -16,7 +16,7 @@ const OrderEditModal = ({ order, isOpen, onClose }) => {
       const fetchOrderItems = async () => {
         try {
           setLoading(true);
-          const response = await axios.get(`http://localhost:8080/order-items/${order.id}`);
+          const response = await axios.get(`https://api.pasitlab.com/order-items/${order.id}`);
           setOrderItems(response.data.order_items);
           setLoading(false);
         } catch (error) {
@@ -35,7 +35,7 @@ const OrderEditModal = ({ order, isOpen, onClose }) => {
     setStatusLoading(true); // Start loading
 
     try {
-      const response = await axios.put(`http://localhost:8080/orders/${order.id}/status`, {
+      const response = await axios.put(`https://api.pasitlab.com/orders/${order.id}/status`, {
         order_status: newStatus
       });
       setStatusLoading(false); // Stop loading
@@ -58,7 +58,7 @@ const OrderEditModal = ({ order, isOpen, onClose }) => {
     setPaymentMethodLoading(true); // Start loading
 
     try {
-      const response = await axios.put(`http://localhost:8080/orders/${order.id}/payment-method`, {
+      const response = await axios.put(`https://api.pasitlab.com/orders/${order.id}/payment-method`, {
         payment_method: newPaymentMethod
       });
       setPaymentMethodLoading(false); // Stop loading
@@ -86,7 +86,7 @@ const OrderEditModal = ({ order, isOpen, onClose }) => {
 
       const changeReason = 'ร้านค้าปรับสถานะรายการ';
 
-      const response = await axios.put(`http://localhost:8080/order-items/${itemId}/status`, {
+      const response = await axios.put(`https://api.pasitlab.com/order-items/${itemId}/status`, {
         new_status: newStatus,
         user: 'restaurant',
         change_reason: changeReason
