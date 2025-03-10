@@ -88,40 +88,47 @@ async function orderMiddleware(req) {
       
       if (tableStatus === 'Occupied') {
         console.log('In Occupied')
-        if (orderIdFromUrl) {
-          // check order status 
-          console.log("Order ID From Url ", orderIdFromUrl);
-          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-          console.log("Resposne Order Status ", orderStatus.data)
+        if (storedOrderId) {
+          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+          console.log("Order Resposne ", orderStatus)
+          console.log("Order Status ", orderStatus.data.order_status)
           if (orderStatus.data.order_status != 'Not Paid') {
-            // remove cookie order id 
             const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-            console.log("Remove order id in cookie")
+            console.log("Delet order id in cookie")
             response.cookies.delete('orderId');
             return response;
           } else {
-            return NextResponse.next();
+            const nextUrl = new URL(url);
+            nextUrl.searchParams.set('orderId', storedOrderId);
+            const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+            return responseWithNewOrderId;
           }
         } else {
-          if (storedOrderId) {
-            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-            console.log("Order Resposne ", orderStatus)
-            console.log("Order Status ", orderStatus.data.order_status)
-            if (orderStatus.data.order_status != 'Not Paid') {
-              const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-              console.log("Delet order id in cookie")
-              response.cookies.delete('orderId');
-              return response;
+          if (orderIdFromUrl) {
+            // check order status 
+            console.log("Order ID From Url ", orderIdFromUrl);
+            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+            console.log("Resposne Order Status ", orderStatus.data)
+            if (orderStatus.data.status !== 404) {
+              if (orderStatus.data.order_status != 'Not Paid') {
+                // remove cookie order id 
+                const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+                console.log("Remove order id in cookie")
+                response.cookies.delete('orderId');
+                return response;
+              } else {
+                return NextResponse.next();
+              }
             } else {
-              const nextUrl = new URL(url);
-              nextUrl.searchParams.set('orderId', storedOrderId);
-              const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-              return responseWithNewOrderId;
+              
             }
           } else {
             return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
+       
           }
-        }
+          } 
+        
+        
       }
       
       if (tableStatus === 'Available') {
