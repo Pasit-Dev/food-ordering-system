@@ -30,9 +30,16 @@ async function orderMiddleware(req) {
   if (tableId === 'takeaway') {
     console.log('Processing Takeaway Order');
 
-    if (orderIdFromUrl) {
-      console.log('Existing orderId found in URL:', orderIdFromUrl);
-      const orderRes = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+    // Check if orderId is already in localStorage
+    let orderId = orderIdFromUrl;
+    if (!orderId) {
+      // If orderId not present in URL, generate new one
+      orderId = localStorage.getItem('orderId'); // Try to get orderId from localStorage
+    }
+
+    if (orderId) {
+      console.log('Existing orderId found:', orderId);
+      const orderRes = await axios.get(`https://api.pasitlab.com/orders/status/${orderId}`);
       if (orderRes.data.order_status === 'Paid' || orderRes.data.order_status === 'Cancelled') {
         const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
         response.headers.set('Clear-OrderId', 'true'); // ให้ Client ลบ orderId ออกจาก localStorage
@@ -61,16 +68,21 @@ async function orderMiddleware(req) {
     }
 
     if (tableStatus === 'Occupied' || tableStatus === 'Available') {
-      if (orderIdFromUrl) {
-        const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-        if (!orderStatus.data.status == 404) {
-          if (orderStatus.data.order_status !== 'Not Paid') {
-            const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-            response.headers.set('Clear-OrderId', 'true'); // ให้ Client ลบ orderId
-            return response;
-          }
-        }  
-        return NextResponse.next();
+      let orderId = orderIdFromUrl;
+
+      if (orderId) {
+        const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderId}`);
+        if (orderStatus.data.status === 404) {
+          const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+          response.headers.set('Clear-OrderId', 'true');
+          return response;
+        }
+
+        if (orderStatus.data.order_status !== 'Not Paid') {
+          const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+          response.headers.set('Clear-OrderId', 'true');
+          return response;
+        }
       } else {
         console.log('Creating new order ID for dine-in');
         const newOrderId = nanoid(8);
@@ -81,6 +93,7 @@ async function orderMiddleware(req) {
         responseWithNewOrderId.headers.set('Set-OrderId', newOrderId); // ให้ Client เก็บค่า orderId
         return responseWithNewOrderId;
       }
+      return NextResponse.next();
     }
 
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
