@@ -143,13 +143,14 @@ async function orderMiddleware(req) {
               return response;
             } else {
               // if (table_id == tableId) {
-              //   const nextUrl = new URL(url);
-              // nextUrl.searchParams.set('orderId', storedOrderId.value);
-              // const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-              // return responseWithNewOrderId;
+                const nextUrl = new URL(url)
+              nextUrl.searchParams.set('orderId', storedOrderId.value);
+              const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+              return responseWithNewOrderId;
               // } else {
               //   // clear cookie and create create new order id 
               // }
+
             }
           } else {
               
