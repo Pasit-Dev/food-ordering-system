@@ -15,15 +15,15 @@ export default function LoginPage() {
     setIsLoading(true)
     setError('')
 
-    if (!/^\d{4}$/.test(pin)) { // ตรวจสอบว่าเป็นตัวเลข 4 หลัก
-      setError('PIN ต้องมี 4 หลัก')
+    if (!/^\d{6}$/.test(pin)) { // ตรวจสอบว่าเป็นตัวเลข 6 หลัก
+      setError('PIN ต้องมี 6 หลัก')
       setIsLoading(false)
       return
     }
 
     try {
       // จำลองการตรวจสอบ PIN (ในระบบจริงต้องเช็คจาก API)
-      if (pin === '1234') { // ตัวอย่าง PIN ถูกต้อง
+      if (pin === '999999') { // ตัวอย่าง PIN ถูกต้อง
         const token = nanoid(32) // สร้าง Token 32 ตัวอักษร
         Cookies.set('auth_token', token, { expires: 1 }) // เก็บใน Cookie (1 วัน)
         router.push('/admin/dashboard')
@@ -43,7 +43,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl transform transition-all hover:scale-105">
         <div className="card-body">
           <h2 className="text-3xl font-extrabold text-center text-gray-800">Admin Login</h2>
-          <p className="text-center text-gray-500 mb-4">กรุณากรอก PIN 4 หลัก</p>
+          <p className="text-center text-gray-500 mb-4">กรุณากรอก PIN 6 หลัก</p>
           {error && <p className="text-red-500 text-center">{error}</p>}
           <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
         </div>
