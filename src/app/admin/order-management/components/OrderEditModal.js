@@ -126,7 +126,7 @@ const OrderEditModal = ({ order, isOpen, onClose }) => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Total</p>
-              <p className="font-medium">${Number(order.total).toFixed(2)}</p>
+              <p className="font-medium">฿{Number(order.total).toFixed(2)}</p>
             </div>
 
             <div>
@@ -173,10 +173,11 @@ const OrderEditModal = ({ order, isOpen, onClose }) => {
                 <thead>
                   <tr>
                     <th>Name</th>
-                    <th>Status</th>
+                    <th>Options</th>
+                    {/* <th>Status</th> */}
                     <th>Quantity</th>
                     <th>Price</th>
-                    <th>Options</th>
+                    
                     <th>Update Status</th>
                   </tr>
                 </thead>
@@ -184,10 +185,15 @@ const OrderEditModal = ({ order, isOpen, onClose }) => {
                   {orderItems.map(item => (
                     <tr key={item.order_item_id}>
                       <td>{item.menu_name}</td>
-                      <td>{item.order_item_status}</td>
+                      <td>
+    {item.options && item.options.length > 0
+        ? item.options.map(option => `${option.option_name}`).join(', ') // ใช้ map() เพื่อดึง option_name และ join() เพื่อรวมเป็นสตริง
+        : 'ไม่มีตัวเลือกเพิ่มเติม'}
+</td>
+                      {/* <td>{item.order_item_status}</td> */}
                       <td>{item.quantity}</td>
-                      <td>${parseFloat(item.price).toFixed(2)}</td>
-                      <td>{item.menu_option_names}</td>
+                      <td>฿{parseFloat(item.price).toFixed(2)}</td>
+                     
                       <td>
                         <select
                           value={item.order_item_status}
@@ -205,8 +211,8 @@ const OrderEditModal = ({ order, isOpen, onClose }) => {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan="4" className="text-right font-semibold">Total:</td>
-                    <td className="font-semibold">${Number(order.total).toFixed(2)}</td>
+                    <td colSpan="3" className="text-right font-semibold">Total:</td>
+                    <td className="font-semibold">฿{Number(order.total).toFixed(2)}</td>
                   </tr>
                 </tfoot>
               </table>

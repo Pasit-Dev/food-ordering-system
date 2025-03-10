@@ -13,6 +13,7 @@ const OrderDetailModal = ({ order, isOpen, onClose }) => {
           setLoading(true);
           const response = await axios.get(`http://localhost:8080/order-items/${order.id}`);
           setOrderItems(response.data.order_items);
+          console.log(response.data.order_items)
           setLoading(false);
         } catch (error) {
           console.error('Error fetching order items:', error);
@@ -28,7 +29,7 @@ const OrderDetailModal = ({ order, isOpen, onClose }) => {
   const calculateTotalPrice = () => {
     const totalPrice = orderItems
       .filter(item => item.order_item_status !== 'Cancelled') // กรองเฉพาะรายการที่ไม่ใช่ 'Cancelled'
-      .reduce((sum, item) => sum + (Number(item.price) + Number(item.total_additional_price)), 0); // คำนวณราคา
+      .reduce((sum, item) => sum + (Number(item.price)), 0); // คำนวณราคา
     return totalPrice.toFixed(2); // คืนค่าราคาในรูปแบบ 2 ตำแหน่งทศนิยม
   };
 
@@ -54,7 +55,7 @@ const OrderDetailModal = ({ order, isOpen, onClose }) => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Total</p>
-              <p>${loading ? 'Loading...' : calculateTotalPrice()}</p> {/* แสดง total price ที่คำนวณได้ */}
+              <p>฿{loading ? 'Loading...' : calculateTotalPrice()}</p> {/* แสดง total price ที่คำนวณได้ */}
             </div>
           </div>
           
@@ -81,10 +82,15 @@ const OrderDetailModal = ({ order, isOpen, onClose }) => {
                     <td>{item.menu_name}</td>
                     <td className={item.order_item_status === 'Cancelled' ? 'text-red-500' : ''}>{item.order_item_status}</td>
                     <td>{item.quantity}</td>
-                    <td>${parseFloat(item.price).toFixed(2)}</td>
-                    <td>${parseFloat(item.menu_price).toFixed(2)}</td>
-                    <td>{item.menu_option_names}</td>
-                    <td>${parseFloat(item.total_additional_price).toFixed(2)}</td>
+                    <td>฿{parseFloat(item.price).toFixed(2)}</td>
+                    <td>฿{parseFloat(item.menu_price).toFixed(2)}</td>
+                    <td>
+    {item.options && item.options.length > 0
+        ? item.options.map(option => `${option.option_name} ${option.additional_price == 0 ? '' : `(${option.additional_price})`}`).join(', ') // ใช้ map() เพื่อดึง option_name และ join() เพื่อรวมเป็นสตริง
+        : 'ไม่มีตัวเลือกเพิ่มเติม'}
+</td>
+<td>฿{item.options.reduce((sum, option) => sum + parseFloat(option.additional_price), 0).toFixed(2)}</td>
+
                   </tr>
                 ))}
               </tbody>

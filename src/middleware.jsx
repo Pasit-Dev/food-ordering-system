@@ -40,6 +40,26 @@ async function orderMiddleware(req) {
         response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
         return response;
       } else {
+        if (orderIdFromUrl) {
+          console.log("1111")
+          const resposne = await axios.get(`http://localhost:8080/orders/status/${orderIdFromUrl}`);
+          const orderStatus = resposne.data.order_status;
+          if (orderStatus) {
+            console.log("2222")
+            if (orderStatus === 'Paid' || orderStatus === 'Cancelled') {
+              console.log('3333')
+              const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+              response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
+              return response;
+            } else {
+              console.log("4444")
+              return NextResponse.next()
+            }
+          } else {
+            console.log('5555')
+            return NextResponse.next()
+          }
+        } 
         const nextUrl = new URL(url);
         nextUrl.searchParams.set('orderId', storedOrderId.value);
         return NextResponse.redirect(nextUrl);
@@ -51,7 +71,7 @@ async function orderMiddleware(req) {
       nextUrl.searchParams.set('orderId', newOrderId);
       const responseWithNewOrderId = NextResponse.redirect(nextUrl);
       responseWithNewOrderId.cookies.set('orderId', newOrderId, { httpOnly: true });
-      return responseWithNewOrderId;
+      return responseWithNewOrderId; 
     }
   } else {
     try {
@@ -67,6 +87,7 @@ async function orderMiddleware(req) {
       if (tableStatus === 'Occupied') {
         if (orderIdFromUrl) {
           const orderStatus = await axios.get(`http://localhost:8080/orders/status/${orderIdFromUrl}`);
+          console.log(`Order Status: ${orderStatus.data.order_status}`)
           if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
             const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
             response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
@@ -74,13 +95,19 @@ async function orderMiddleware(req) {
           } else {
             if (storedOrderId) {
               const orderStatus = await axios.get(`http://localhost:8080/orders/status/${storedOrderId.value}`);
-              if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
-                const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-                response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
-                return response;
+              console.log(`Order Status from cookie : ${orderStatus.data.order_status}`)
+              if (!orderStatus.data.order_status) {
+                return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
               } else {
-                return NextResponse.next();
+                if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
+                  const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+                  response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
+                  return response;
+                } else {
+                  return NextResponse.next();
+                }
               }
+              
             } else {
               return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
             }

@@ -17,13 +17,14 @@ const useCartStore = create((set) => ({
       return { cartItems: newCart };
     }),
 
-  // ฟังก์ชันลบรายการจากตะกร้า
-  removeItem: (id) =>
-    set((state) => {
-      const newCart = state.cartItems.filter((item) => item.menu_id !== id);
-      localStorage.setItem("cart", JSON.stringify(newCart)); // อัปเดต localStorage
-      return { cartItems: newCart };
-    }),
+  // ฟังก์ชันลบรายการจากตะกร้าตาม index
+removeItem: (index) =>
+  set((state) => {
+    const newCart = state.cartItems.filter((_, idx) => idx !== index);
+    localStorage.setItem("cart", JSON.stringify(newCart)); // อัปเดต localStorage
+    return { cartItems: newCart };
+  }),
+
 
   // ฟังก์ชันอัปเดตรายการในตะกร้า
   updateItem: (index, newData) =>

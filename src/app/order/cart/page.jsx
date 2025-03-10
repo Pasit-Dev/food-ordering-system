@@ -34,8 +34,9 @@ export default function CartPage() {
     let addOnPrice = 0;
   
     item.selected_options.forEach((opt) => {
-      addOnPrice += parseFloat(opt.additional_price);
+      addOnPrice += parseInt(opt.additional_price);
     });
+    console.log(addOnPrice)
   
     // คำนวณ total_price ใหม่
     const newTotalPrice = ((basePrice + addOnPrice) * newQuantity).toFixed(0);
@@ -46,11 +47,6 @@ export default function CartPage() {
       total_price: newTotalPrice,
     });
   };
-  
-  
-  
-  
-
   
   
 
@@ -86,8 +82,8 @@ export default function CartPage() {
     setCartItems(updatedItems); // อัปเดต state ใหม่
   };
 
-  const handleRemoveItem = (menu_id) => {
-    removeItem(menu_id);
+  const handleRemoveItem = (index) => {
+    removeItem(index);
   };
 
   const calculateTotal = () => {
@@ -99,23 +95,28 @@ export default function CartPage() {
       alert("กรุณาเพิ่มรายการอาหารก่อนสั่ง");
       return;
     }
-
+    const checkName = await axios.get(`http://localhost:8080/orders/status/${orderId}`);
+    console.log("customer name ", checkName.data.customer)
     let customerName = '';
-    if (tableId === 'takeaway') {
+    if (!checkName.data.customer) {
+      console.log('have customer name',)
+     
       customerName = prompt("กรุณากรอกชื่อผู้ใช้:");
       if (!customerName) {
         alert("กรุณากรอกชื่อผู้ใช้เพื่อดำเนินการสั่งซื้อ");
         return;
       }
-    }
+    } 
+
 
     const orderData = {
       order_id: orderId,
-      customer_name: tableId === 'takeaway' ? customerName : '',
+      customer_name: customerName,
       table_id: tableId,
       items: cartItems.map(item => ({
         menu_id: item.menu_id,
         quantity: item.quantity,
+        note: item.note,
         price: Number(item.total_price),
         options: item.selected_options.map(option => ({
           menu_option_id: option.option_id,
@@ -199,7 +200,7 @@ export default function CartPage() {
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <h3 className="font-bold">{item.menu_name}</h3>
-                      <button onClick={() => handleRemoveItem(item.menu_id)} className="btn btn-xs btn-ghost btn-circle">
+                      <button onClick={() => handleRemoveItem(idx)} className="btn btn-xs btn-ghost btn-circle">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>

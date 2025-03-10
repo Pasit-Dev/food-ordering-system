@@ -167,9 +167,8 @@ export default function MenuDetail() {
     Object.values(selectedOptions).forEach((opt) => {
       addOnPrice += parseFloat(opt.additional_price || 0);
     });
-  
-    const totalAmount = (menuData.price + addOnPrice) * 1; // Initially 1 item
-  
+    
+    // const totalAmount = (menuData.price + addOnPrice); // Initially 1 item
     const orderItem = {
       menu_id: menuData.menu_id,
       menu_name: menuData.menu_name,

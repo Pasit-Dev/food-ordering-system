@@ -123,19 +123,21 @@ export default function HistoryPage() {
                                         )}
                                     </div>
 
-                                    {item.order_item_note && (
+                                    {item.order && (
                                         <p className="text-xs italic mt-2 text-gray-600">
                                             <span className="font-semibold">หมายเหตุ:</span> {item.order_item_note}
                                         </p>
                                     )}
-
+                                    <div className="text-sm text-gray-500 mt-2"> 
+                                        <span>note: {item.order_item_note}</span>
+                                    </div>
                                     {/* แสดง quantity */}
                                     <div className="text-sm text-gray-500 mt-2">
                                         <span>จำนวน: {item.quantity}</span>
                                     </div>
 
                                     <div className="flex justify-between items-center mt-3">
-                                        <div className="text-primary font-bold">{item.price * item.quantity} ฿</div> {/* คำนวณราคาโดยคูณกับ quantity */}
+                                        <div className="text-primary font-bold">{item.price} ฿</div> {/* คำนวณราคาโดยคูณกับ quantity */}
                                         {item.order_item_status === 'Pending' && (
                                             <button
                                                 onClick={() => handleCancelOrder(item.order_item_id)}
