@@ -1,13 +1,20 @@
 "use client";
+
 import axios from "axios";
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
 import useCartStore from "../../store/useCartStore";
 
 export default function CartPage() {
-  const router = useRouter();
+  return (
+    <Suspense fallback={<div>Loading ... </div>}>
+      <CartContent />
+    </Suspense>
+  )
+}
+
+function CartContent() {
   const searchParams = useSearchParams();
   const tableId = searchParams.get('tableId') || '';
   const orderId = searchParams.get('orderId') || '';
