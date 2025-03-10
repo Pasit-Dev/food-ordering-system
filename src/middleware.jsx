@@ -83,6 +83,8 @@ async function orderMiddleware(req) {
       }
       
       if (tableStatus === 'Occupied') {
+
+        console.log('In Occupied')
           if (orderIdFromUrl) {
             // check order status 
             const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
@@ -113,16 +115,21 @@ async function orderMiddleware(req) {
           }
       }
         if (tableStatus === 'Available') {
+          console.log('In Available')
           if (orderIdFromUrl) {
             const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-            if (orderStatus.data.order_status !== 'Not Paid') {
-              // remove cookie order id 
-              const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-              response.cookies.delete('orderId');
-              return response;
+            if (orderStatus) {
+              if (orderStatus.data.order_status !== 'Not Paid') {
+                const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+                response.cookies.delete('orderId');
+                return response;
+              } else {
+                return NextResponse.next();
+              }
             } else {
               return NextResponse.next();
             }
+            
           } else {
             const newOrderId = nanoid(8);
             const nextUrl = new URL(url);
