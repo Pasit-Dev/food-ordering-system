@@ -39,7 +39,8 @@ async function orderMiddleware(req) {
 
   if (storedOrderId) {
     const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-    const { table_id, order_status } = response.data;
+    if (response.data.status != 404) {
+      const { table_id, order_status } = response.data;
     if (table_id == tableId && order_status === 'Not Paid') {
       const nextUrl = new URL(url);
       nextUrl.searchParams.set('orderId', storedOrderId.value);
@@ -47,6 +48,7 @@ async function orderMiddleware(req) {
       return responseWithNewOrderId;
     } else {
       return NextResponse.redirect(new URL('/tableidnotmatch', req.nextUrl.origin));
+    }
     }
   }
 
