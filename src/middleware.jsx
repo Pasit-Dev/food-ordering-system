@@ -97,7 +97,7 @@ console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
       
       if (tableStatus === 'Occupied') {
         console.log('In Occupied')
-        if (orderIdFromUrl  != null || orderIdFromUrl != undefined) {
+        if (orderIdFromUrl != null || orderIdFromUrl != undefined || orderIdFromUrl != 'null') {
           // check order status 
           console.log("Order ID From Url ", orderIdFromUrl);
           const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
