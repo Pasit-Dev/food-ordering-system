@@ -31,9 +31,10 @@ export default function TableItem({ table }) {
   useEffect(() => {
     const generateQRCode = async () => {
       try {
+        const domain = window.location.origin;
         // เช็คว่าเป็นโต๊ะ "กลับบ้าน" หรือไม่
         const qrCodeData = table.table_number === 'takeaway' // ใช้ 'takeaway' เป็น table_number
-          ? 'takeaway'  // ถ้าเป็นโต๊ะพิเศษให้ใช้ 'takeaway' เป็น QR Code
+          ? `${domain}/order?tableId=takeaway`  // ถ้าเป็นโต๊ะพิเศษให้ใช้ 'takeaway' เป็น QR Code
           : table.qrcode; // ถ้าไม่ใช่ ก็ใช้ qrcode ของโต๊ะ
 
         const qrCodeUrl = await QRCode.toDataURL(qrCodeData);
