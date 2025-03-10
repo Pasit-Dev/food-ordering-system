@@ -35,12 +35,50 @@ export default function AddMenuModal({ onClose, onSave, editingMenu }) {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxSize = 720; // ปรับขนาดสูงสุด
+          let width = img.width;
+          let height = img.height;
+  
+          if (width > height) {
+            if (width > maxSize) {
+              height *= maxSize / width;
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width *= maxSize / height;
+              height = maxSize;
+            }
+          }
+  
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+  
+          // แปลงเป็น WebP เพื่อลดขนาด
+          canvas.toBlob(
+            (blob) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(blob);
+              reader.onloadend = () => {
+                setImage(reader.result); // เก็บภาพที่ถูกบีบอัด
+              };
+            },
+            "image/webp",
+            0.7 // กำหนดคุณภาพของรูป (0.0 - 1.0)
+          );
+        };
       };
       reader.readAsDataURL(file);
     }
   };
+  
 
   const handleSubmit = () => {
     const formattedData = {

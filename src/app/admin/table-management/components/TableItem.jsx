@@ -179,12 +179,12 @@ export default function TableItem({ table }) {
         >
           Edit
         </button>
-        <button
+        {/* <button
           className="btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none"
           onClick={handleDelete}
         >
           Delete
-        </button>
+        </button> */}
       </div>
     </div>
   );

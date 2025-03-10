@@ -3,9 +3,9 @@
 import Image from "next/image";
 
 export default function Home() {
-  const currentURL = window.location.href; // ดึง URL เต็ม เช่น "https://example.com/page?query=123"
-  const domain = window.location.origin; // ดึงเฉพาะ domain เช่น "https://example.com"
-  console.log(currentURL, domain);
+  // const currentURL = window.location.href; // ดึง URL เต็ม เช่น "https://example.com/page?query=123"
+  // const domain = window.location.origin; // ดึงเฉพาะ domain เช่น "https://example.com"
+  // console.log(currentURL, domain);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
