@@ -16,7 +16,9 @@ export default function Sidebar() {
   const handleLogout = () => {
     // Add your logout logic here
     console.log("Logging out...")
+    document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     // Example: router.push('/login')
+    window.location.href = '/admin/login';
   }
 
   return (
