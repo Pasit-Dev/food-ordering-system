@@ -117,8 +117,10 @@ async function orderMiddleware(req) {
         if (tableStatus === 'Available') {
           console.log('In Available')
           if (orderIdFromUrl) {
+            console.log("Have order id in URL")
             const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-            if (orderStatus) {
+            if (orderStatus.data.status == 200) {
+              console.log("Order Status ", orderStatus.data.status)
               if (orderStatus.data.order_status !== 'Not Paid') {
                 const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
                 response.cookies.delete('orderId');
@@ -127,10 +129,12 @@ async function orderMiddleware(req) {
                 return NextResponse.next();
               }
             } else {
+              console.log('Order Status ', orderStatus.data.status);
               return NextResponse.next();
             }
             
           } else {
+            console.log("Haven't order id IN URL")
             const newOrderId = nanoid(8);
             const nextUrl = new URL(url);
             nextUrl.searchParams.set('orderId', newOrderId);
