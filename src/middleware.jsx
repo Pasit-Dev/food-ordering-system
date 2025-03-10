@@ -102,7 +102,7 @@ async function orderMiddleware(req) {
           }
         } else {
           if (storedOrderId) {
-            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId}`);
+            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
             console.log("Order Resposne ", orderStatus)
             console.log("Order Status ", orderStatus.data.order_status)
             if (orderStatus.data.order_status != 'Not Paid') {
