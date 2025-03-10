@@ -1,43 +1,34 @@
 'use client'
 import { useState } from 'react'
 
-
-export default function LoginForm(onSubmit, isLoading) {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+export default function LoginForm({ onSubmit, isLoading }) {
+  const [pin, setPin] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onSubmit(username, password)
+    onSubmit(pin)
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-control">
         <label className="label">
-          <span className="label-text text-black">Username</span>
+          <span className="label-text text-black">Enter PIN (6 digits)</span>
         </label>
         <input
           type="text"
-          placeholder="Enter username"
+          placeholder="Enter 6-digit PIN"
           className="input input-bordered text-black"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={pin}
+          onChange={(e) => {
+            // Allow only numbers and limit to 6 characters
+            const value = e.target.value;
+            if (/^\d{0,6}$/.test(value)) {
+              setPin(value);
+            }
+          }}
           required
-        />
-      </div>
-      
-      <div className="form-control mt-4">
-        <label className="label">
-          <span className="label-text text-black">Password</span>
-        </label>
-        <input
-          type="password"
-          placeholder="Enter password"
-          className="input input-bordered text-black"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
+          maxLength={6}  // Ensures the input can only have up to 6 digits
         />
       </div>
       
