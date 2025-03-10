@@ -113,7 +113,25 @@ console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
               return NextResponse.next();
             }
           } else {
-            
+            if (storedOrderId) {
+              const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+              console.log("Order Resposne ", orderStatus)
+              console.log("Order Status ", orderStatus.data.order_status)
+              if (orderStatus.data.order_status != 'Not Paid') {
+                const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+                console.log("Delet order id in cookie")
+                response.cookies.delete('orderId');
+                return response;
+              } else {
+                const nextUrl = new URL(url);
+                nextUrl.searchParams.set('orderId', storedOrderId);
+                const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+                return responseWithNewOrderId;
+              }
+            } else {
+                
+            return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
+              }
           }
         } else {
           if (storedOrderId) {
