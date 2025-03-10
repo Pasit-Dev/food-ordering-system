@@ -29,6 +29,15 @@ async function orderMiddleware(req) {
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
   console.log('Stored Data: ', storedOrderId);
+
+  if (orderIdFromUrl) {
+    const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+    if (resposne.data.order_status != 'Not Paid' && resposne.data.status !== 404) {
+      return NextResponse.redirect(new URL('/404', req.nextUrl.origin))
+    } else {
+      return NextResponse.next()
+    }
+  }
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
