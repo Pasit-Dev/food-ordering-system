@@ -81,96 +81,57 @@ async function orderMiddleware(req) {
       if (tableStatus === 'Reserved') {
         return NextResponse.redirect(new URL('/reserved', req.nextUrl.origin));
       }
-
+      
       if (tableStatus === 'Occupied') {
-        if (orderIdFromUrl) {
-          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-          console.log(`Order Status: ${orderStatus.data.order_status}`)
-          if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
-            const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-            response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
-            return response;
+          if (orderIdFromUrl) {
+            // check order status 
+            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+            if (orderStatus.data.order_status !== 'Not Paid') {
+              // remove cookie order id 
+              const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+              response.cookies.delete('orderId');
+              return response;
+            } else {
+              return NextResponse.next();
+            }
           } else {
             if (storedOrderId) {
               const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-              console.log(`Order Status from cookie : ${orderStatus.data.order_status}`)
-              if (!orderStatus.data.order_status) {
-                return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
-              } else {
-                if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
-                  const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-                  response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
-                  return response;
-                } else {
-                  return NextResponse.next();
-                }
-              }
-              
-            } else {
-              console.log("not found cookie")
-              return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
-            }
-          }
-        } else {
-          if (storedOrderId) {
-            console.log("Stored Order ID : ", storedOrderId);
-            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-            console.log(`Order Status from cookie : ${orderStatus.data.order_status}`)
-            if (!orderStatus.data.order_status) {
-              return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
-            } else {
-              if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
+              if (orderStatus.data.order_status !== 'Not Paid') {
                 const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-                response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
-                return response;
+              response.cookies.delete('orderId');
+              return response;
               } else {
                 const nextUrl = new URL(url);
                 nextUrl.searchParams.set('orderId', storedOrderId.value);
-                return NextResponse.redirect(nextUrl);
+                const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+                return responseWithNewOrderId;
               }
+            } else {
+              return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
             }
-            
+          }
+      }
+        if (tableStatus === 'Available') {
+          if (orderIdFromUrl) {
+            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+            if (orderStatus.data.order_status !== 'Not Paid') {
+              // remove cookie order id 
+              const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+              response.cookies.delete('orderId');
+              return response;
+            } else {
+              return NextResponse.next();
+            }
           } else {
-            console.log("not found cookie")
-            return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
+            const newOrderId = nanoid(8);
+            const nextUrl = new URL(url);
+            nextUrl.searchParams.set('orderId', newOrderId);
+            const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+            responseWithNewOrderId.cookies.set('orderId', newOrderId);
+            return responseWithNewOrderId;
           }
         }
-      }
-
-      if (tableStatus === 'Available') {
-        if (orderIdFromUrl) {
-          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-          if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
-            const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-            response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
-            return response;
-          } else {
-            // if (orderIdFromUrl === storedOrderId) {
-            //   const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-            //   if (orderStatus.data.order_status === 'Paid' || orderStatus.data.order_status === 'Cancelled') {
-            //     const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-            //     response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
-            //     return response;
-            //   } else {
-            //     return NextResponse.next();
-            //   }
-            // } else {
-            //   return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin))
-            // }
-            return NextResponse.next()
-          }
-        } else {
-          console.log("Table is Available, creating new order ID");
-          const newOrderId = nanoid(8);
-        const nextUrl = new URL(url);
-        nextUrl.searchParams.set('orderId', newOrderId);
-        const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-        responseWithNewOrderId.cookies.set('orderId', newOrderId);
-        return responseWithNewOrderId;
-        }
-        
-      }
-
       return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
     } catch (err) {
       console.error(`Error fetching table status:`, err);
