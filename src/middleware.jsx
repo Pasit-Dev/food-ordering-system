@@ -19,7 +19,15 @@ async function orderMiddleware(req) {
   const url = req.nextUrl;
   const tableId = String(url.searchParams.get('tableId'));  
   const storedOrderId = req.cookies.get('orderId');
-  const orderIdFromUrl = url.searchParams.get('orderId') || '';
+  const orderIdFromUrl = url.searchParams.get('orderId');
+  if (orderIdFromUrl === null || orderIdFromUrl === 'undefined' || orderIdFromUrl.trim() === '') {
+    console.log('No orderId in URL, setting to default or empty value');
+    orderIdFromUrl = '';
+  } else {
+    console.log('Order ID from URL:', orderIdFromUrl);
+  }
+
+  
 console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
 
   console.log('Cookie store:', storedOrderId);
