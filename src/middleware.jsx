@@ -21,7 +21,7 @@ async function orderMiddleware(req) {
   const storedOrderId = req.cookies.get('orderId');
   const orderIdFromUrl = url.searchParams.get('orderId');
 
-  console.log("orderIdFromUrl: ", orderIdFromUrl);  // พิมพ์ค่าออกมาเพื่อเช็คว่าได้ค่าอะไร
+  console.log("orderIdFromUrl: ", JSON.stringify(orderIdFromUrl));  // พิมพ์ค่าออกมาเพื่อเช็คว่าได้ค่าอะไร
   console.log('Cookie store:', storedOrderId);
   console.log('Table id:', tableId);
   
