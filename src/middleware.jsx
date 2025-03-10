@@ -102,7 +102,7 @@ console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
           console.log("Order ID From Url ", typeof orderIdFromUrl);
           const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
           console.log("Resposne Order Status ", orderStatus.data)
-          if (orderStatus.data.status !== 404) {
+          if (orderStatus.data.status != 404) {
             if (orderStatus.data.order_status != 'Not Paid') {
               // remove cookie order id 
               const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
@@ -173,6 +173,7 @@ console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
           return responseWithNewOrderId;
         }
       }
+      console.log("Error to 404");
       return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
     } catch (err) {
       console.error(`Error fetching table status:`, err);
