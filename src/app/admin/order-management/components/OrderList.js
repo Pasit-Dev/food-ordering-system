@@ -7,8 +7,8 @@ const OrderList = ({ orders, onViewOrder, onEditOrder }) => {
       <table className="table table-zebra">
         <thead>
           <tr>
-            <th>Order ID</th>
             <th>Table</th>
+            <th>Customer Name</th>
             <th>Date</th>
             <th>Status</th>
             <th>Total</th>
@@ -19,8 +19,9 @@ const OrderList = ({ orders, onViewOrder, onEditOrder }) => {
           {orders.length > 0 ? (
             orders.map((order) => (
               <tr key={order.id}>
-                <td>{order.id}</td>
+                
                 <td>{order.tableNumber}</td>
+                <td>{order.customer_name}</td>
                 <td>{order.orderDate}</td>
                 <td><StatusBadge status={order.status} /></td>
                 <td>฿{Number(order.total).toFixed(2)}</td>
