@@ -151,7 +151,6 @@ export default function TableItem({ table }) {
               <option value="Available">Available</option>
               <option value="Occupied">Occupied</option>
               <option value="Reserved">Reserved</option>
-              <option value="Takeaway">Takeaway</option> {/* เพิ่มตัวเลือกสำหรับ Takeaway */}
             </select>
           </div>
 

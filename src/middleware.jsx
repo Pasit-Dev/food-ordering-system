@@ -67,7 +67,7 @@ async function orderMiddleware(req) {
       const nextUrl = new URL(url);
       nextUrl.searchParams.set('orderId', newOrderId);
       const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-      responseWithNewOrderId.cookies.set('orderId', newOrderId, { httpOnly: true });
+      responseWithNewOrderId.cookies.set('orderId', newOrderId, { sameSite: 'None' });
       return responseWithNewOrderId; 
     }
   } else {
@@ -112,6 +112,7 @@ async function orderMiddleware(req) {
           }
         } else {
           if (storedOrderId) {
+            console.log("Stored Order ID : ", storedOrderId);
             const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
             console.log(`Order Status from cookie : ${orderStatus.data.order_status}`)
             if (!orderStatus.data.order_status) {
@@ -163,7 +164,7 @@ async function orderMiddleware(req) {
         const nextUrl = new URL(url);
         nextUrl.searchParams.set('orderId', newOrderId);
         const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-        responseWithNewOrderId.cookies.set('orderId', newOrderId, { httpOnly: true });
+        responseWithNewOrderId.cookies.set('orderId', newOrderId, { sameSite: 'None'});
         return responseWithNewOrderId;
         }
         
