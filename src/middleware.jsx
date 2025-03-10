@@ -195,6 +195,10 @@ async function adminMiddleware(req) {
     }
     console.log('No token found, redirection to /admin/login');
     return NextResponse.redirect(new URL('/admin/login', req.nextUrl.origin));
+  } else {
+    if (req.nextUrl.pathname.startsWith('/admin/login')) {
+      return NextResponse.redirect(new URL('/admin/dashboard', req.nextUrl.origin))
+    }
   }
 
   console.log("Token found, allowing access to /admin");
