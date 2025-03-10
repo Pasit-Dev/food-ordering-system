@@ -24,20 +24,17 @@ async function orderMiddleware(req) {
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
 
+  // ✅ ถ้า URL มี orderId อยู่แล้ว ให้ผ่านไปเลย (Client จัดการ localStorage)
+  if (orderIdFromUrl) {
+    return NextResponse.next();
+  }
+
+  // ✅ ถ้าเป็น Takeaway และไม่มี orderId → สร้าง orderId ใหม่แล้ว redirect
   if (tableId === 'takeaway') {
-    if (orderIdFromUrl) {
-      const orderRes = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-      if (['Paid', 'Cancelled'].includes(orderRes.data.order_status)) {
-        return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-      }
-      return NextResponse.next();
-    } else {
-      // สร้าง orderId ใหม่ และให้ client จัดการ localStorage เอง
-      const newOrderId = nanoid(8);
-      const nextUrl = new URL(url);
-      nextUrl.searchParams.set('orderId', newOrderId);
-      return NextResponse.redirect(nextUrl);
-    }
+    const newOrderId = nanoid(8);
+    const nextUrl = new URL(url);
+    nextUrl.searchParams.set('orderId', newOrderId);
+    return NextResponse.redirect(nextUrl);
   }
 
   try {
@@ -56,13 +53,10 @@ async function orderMiddleware(req) {
     }
 
     if (tableStatus === 'Available') {
-      if (!orderIdFromUrl) {
-        const newOrderId = nanoid(8);
-        const nextUrl = new URL(url);
-        nextUrl.searchParams.set('orderId', newOrderId);
-        return NextResponse.redirect(nextUrl);
-      }
-      return NextResponse.next();
+      const newOrderId = nanoid(8);
+      const nextUrl = new URL(url);
+      nextUrl.searchParams.set('orderId', newOrderId);
+      return NextResponse.redirect(nextUrl);
     }
 
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
