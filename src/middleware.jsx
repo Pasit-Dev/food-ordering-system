@@ -17,7 +17,7 @@ export async function middleware(req) {
 async function orderMiddleware(req) {
   console.log('Middleware for /order');
   const url = req.nextUrl;
-  const tableId = url.searchParams.get('tableId');  
+  const tableId = String(url.searchParams.get('tableId'));  
   const storedOrderId = req.cookies.get('orderId');
   const orderIdFromUrl = String(url.searchParams.get('orderId'));
 console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
@@ -29,16 +29,15 @@ console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
     console.log('Redirection to 404 not found');
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
-  console.log('Stored Data: ', storedOrderId);
 
-  if (orderIdFromUrl) {
-    const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-    if (resposne.data.order_status != 'Not Paid' && resposne.data.status !== 404) {
-      return NextResponse.redirect(new URL('/404', req.nextUrl.origin))
-    } else {
-      return NextResponse.next()
-    }
-  }
+  // if (orderIdFromUrl) {
+  //   const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+  //   if (resposne.data.order_status != 'Not Paid' && resposne.data.status !== 404) {
+  //     return NextResponse.redirect(new URL('/404', req.nextUrl.origin))
+  //   } else {
+  //     return NextResponse.next()
+  //   }
+  // }
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
@@ -98,45 +97,45 @@ console.log("orderIdFromUrl (as string): ", orderIdFromUrl);
       
       if (tableStatus === 'Occupied') {
         console.log('In Occupied')
-        if (storedOrderId) {
-          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-          console.log("Order Resposne ", orderStatus)
-          console.log("Order Status ", orderStatus.data.order_status)
-          if (orderStatus.data.order_status != 'Not Paid') {
-            const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-            console.log("Delet order id in cookie")
-            response.cookies.delete('orderId');
-            return response;
-          } else {
-            const nextUrl = new URL(url);
-            nextUrl.searchParams.set('orderId', storedOrderId);
-            const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-            return responseWithNewOrderId;
-          }
-        } else {
-          if (orderIdFromUrl) {
-            // check order status 
-            console.log("Order ID From Url ", orderIdFromUrl);
-            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
-            console.log("Resposne Order Status ", orderStatus.data)
-            if (orderStatus.data.status !== 404) {
-              if (orderStatus.data.order_status != 'Not Paid') {
-                // remove cookie order id 
-                const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-                console.log("Remove order id in cookie")
-                response.cookies.delete('orderId');
-                return response;
-              } else {
-                return NextResponse.next();
-              }
+        if (orderIdFromUrl) {
+          // check order status 
+          console.log("Order ID From Url ", orderIdFromUrl);
+          const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
+          console.log("Resposne Order Status ", orderStatus.data)
+          if (orderStatus.data.status !== 404) {
+            if (orderStatus.data.order_status != 'Not Paid') {
+              // remove cookie order id 
+              const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+              console.log("Remove order id in cookie")
+              response.cookies.delete('orderId');
+              return response;
             } else {
-              
+              return NextResponse.next();
             }
           } else {
-            return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
-       
+            
           }
-          } 
+        } else {
+          if (storedOrderId) {
+            const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+            console.log("Order Resposne ", orderStatus)
+            console.log("Order Status ", orderStatus.data.order_status)
+            if (orderStatus.data.order_status != 'Not Paid') {
+              const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+              console.log("Delet order id in cookie")
+              response.cookies.delete('orderId');
+              return response;
+            } else {
+              const nextUrl = new URL(url);
+              nextUrl.searchParams.set('orderId', storedOrderId);
+              const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+              return responseWithNewOrderId;
+            }
+          } else {
+              
+          return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
+            } 
+        } 
         
         
       }
