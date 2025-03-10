@@ -187,7 +187,7 @@ async function adminMiddleware(req) {
   console.log('Middleware for /admin');
   
   // Retrieve cookies from the headers using Next.js 'cookies' helper
-  const token = req.cookies.get('token');
+  const token = req.cookies.get('auth_token');
   // Check if token is missing
   if (!token) {
     if (req.nextUrl.pathname.startsWith('/admin/login')) {
