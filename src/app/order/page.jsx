@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import useMenuStore from "../store/useMenuStore";
@@ -8,36 +9,44 @@ import { Search, ShoppingBag, ChevronLeft } from "lucide-react"; // เพิ่
 export default function OrderPage() {
   return (
     <Suspense fallback={<div>Loading ...</div>}>
-      <OrderContent />
+      <OrderContent/>
     </Suspense>
-  );
+  )
 }
 
 function OrderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableId") || "";
-  let orderId = searchParams.get("orderId") || "";
+  const orderIdFromUrl = searchParams.get("orderId") || "";
 
   const { menus, fetchMenus, loading, error } = useMenuStore();
   const [searchQuery, setSearchQuery] = useState("");
-  const [tableNumber, setTableNumber] = useState(""); // สถานะเก็บหมายเลขโต๊ะ
+  const [tableNumber, setTableNumber] = useState(""); // สถานะเก็บหมายเลขโต๊ะ 
+  const [orderId, setOrderId] = useState("")
 
-  // เช็คว่า orderId มีอยู่ใน localStorage ไหม
   useEffect(() => {
-    if (!orderId) {
-      orderId = localStorage.getItem("orderId"); // ดึงจาก localStorage
-    }
+    let storedOrderId = localStorage.getItem("orderId");
 
-    // ถ้าไม่มี orderId ใน URL หรือ localStorage, สร้างใหม่
-    if (!orderId) {
-      const newOrderId = nanoid(8); // สร้าง orderId ใหม่
-      orderId = newOrderId;
-      localStorage.setItem("orderId", newOrderId); // เก็บ orderId ไว้ใน localStorage
-      router.push(`/order?tableId=${tableId}&orderId=${newOrderId}`); // อัปเดต URL ให้มี orderId
+    if (orderIdFromUrl) {
+      // ถ้ามี orderId ใน URL ให้ใช้ค่านั้น
+      setOrderId(orderIdFromUrl);
+      localStorage.setItem("orderId", orderIdFromUrl);
+    } else if (storedOrderId) {
+      // ถ้าไม่มีใน URL แต่มีใน localStorage ให้ใช้ค่านั้น
+      setOrderId(storedOrderId);
+      router.replace(`/order?tableId=${tableId}&orderId=${storedOrderId}`);
+    } else {
+      // ถ้าไม่มี orderId เลย ให้สร้างใหม่
+      const newOrderId = nanoid(8);
+      setOrderId(newOrderId);
+      localStorage.setItem("orderId", newOrderId);
+      router.replace(`/order?tableId=${tableId}&orderId=${newOrderId}`);
     }
+  }, [orderIdFromUrl, tableId, router]);
 
-    // ดึงข้อมูลหมายเลขโต๊ะจาก API
+  useEffect(() => {
+    // ดึงหมายเลขโต๊ะจาก API
     if (tableId && tableId !== "takeaway") {
       fetch(`https://api.pasitlab.com/tables/${tableId}`)
         .then((response) => response.json())
@@ -49,7 +58,7 @@ function OrderContent() {
         });
     }
     fetchMenus();
-  }, [tableId, fetchMenus, router, orderId]); // เพิ่ม orderId เพื่อให้ useEffect รีเฟรช
+  }, [tableId, fetchMenus]);
 
   const handleMenuClick = (item) => {
     if (item.menu_status === "Available") {
@@ -67,7 +76,21 @@ function OrderContent() {
       {/* Fixed Header */}
       <header className="fixed top-0 inset-x-0 z-10 bg-white text-gray-800 shadow-md">
         <div className="flex justify-between items-center p-4">
-          <h1 className="text-xl font-bold">เมนูอาหาร</h1>
+          <div className="flex items-center gap-2">
+            {/* <Link href={`/?tableId=${tableId}&orderId=${orderId}`} className="text-gray-600">
+              <ChevronLeft size={24} />
+            </Link> */}
+            <h1 className="text-xl font-bold">เมนูอาหาร</h1>
+          </div>
+          {/* <Link 
+            href={`/order/cart?tableId=${tableId}&orderId=${orderId}`} 
+            className="relative p-2 rounded-full bg-blue-50 text-blue-600"
+          >
+            <ShoppingBag size={20} />
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              0
+            </span>
+          </Link> */}
         </div>
 
         {/* Status badge */}
