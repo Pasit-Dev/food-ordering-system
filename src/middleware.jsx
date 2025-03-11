@@ -71,15 +71,10 @@ async function orderMiddleware(req) {
           return responseWithOldOrderId;
             } 
         }
-        // if (data.table_id != tableId) {
-        //   console.log('table Id not matching!');
-        //   const nextUrl = new URL(url);
-        //   nextUrl.searchParams.set('tableId', data.table_id);
-        //   nextUrl.searchParams.set('orderId', storedOrderId.value);
-        //   const responseWithOldOrderId = NextResponse.redirect(nextUrl);
-        //   return responseWithOldOrderId;
-        // }
-      //   }
+      } else {
+        const nextUrl = new URL(url);
+        nextUrl.searchParams.set('orderId', storedOrderId.value);
+        return NextResponse.redirect(nextUrl);
       }
     } catch (err) {
       console.error("Error fetching order status:", err);
