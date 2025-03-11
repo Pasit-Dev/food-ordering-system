@@ -30,7 +30,7 @@ function HistoryContent() {;
     const totalPrice = (orderItems && orderItems.length > 0)
     ? orderItems
         .filter(item => item.order_item_status !== 'Cancelled')
-        .reduce((sum, item) => sum + Number(item.price) * item.quantity, 0) // คำนวณตามจำนวน (quantity)
+        .reduce((sum, item) => sum + Number(item.price), 0) // คำนวณตามจำนวน (quantity)
     : 0;
 
     const formattedTotalPrice = new Intl.NumberFormat('th-TH').format(totalPrice);
