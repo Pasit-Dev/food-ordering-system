@@ -45,6 +45,7 @@ async function orderMiddleware(req) {
       if (data.status != 404) {
         console.log("fetch table id stataus not 404", data)
         if (data.order_Status == 'Not Paid' && data.table_id != tableId) {
+          console.log('table Id not matching!');
           const nextUrl = new URL(url);
           nextUrl.searchParams.set('tableId', data.table_id);
           nextUrl.searchParams.set('orderId', storedOrderId.value);
