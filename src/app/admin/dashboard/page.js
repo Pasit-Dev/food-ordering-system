@@ -186,8 +186,8 @@ export default function Dashboard() {
                     className="w-20 h-20 object-cover rounded-full mx-auto mb-2"
                   />
                   <h4 className="text-sm font-semibold">{menu.menu_name}</h4>
-                  <p className="text-xs text-gray-600">Total Sold: {menu.total_sold}</p>
-                  <p className="text-sm font-bold text-blue-600">฿{menu.menu_price}</p>
+                  {/* <p className="text-xs text-gray-600">Total Sold: {menu.total_sold}</p> */}
+                  {/* <p className="text-sm font-bold text-blue-600">฿{menu.menu_price}</p> */}
                 </div>
               </CardContent>
             </Card>
