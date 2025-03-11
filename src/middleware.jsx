@@ -38,9 +38,12 @@ async function orderMiddleware(req) {
 
   if (storedOrderId) {
     try {
+      console.log("found order id in cookie and check table id matching ")
       const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
       const data = resposne.data;
+      console.log('fetching check table id matching ')
       if (data.status != 404) {
+        console.log("fetch table id stataus not 404", data)
         if (data.order_Status == 'Not Paid' && data.table_id != tableId) {
           const nextUrl = new URL(url);
           nextUrl.searchParams.set('tableId', data.table_id);
@@ -53,20 +56,6 @@ async function orderMiddleware(req) {
       console.error("Error fetching order status:", err);
     }
   }
-
-// if (storedOrderId) {
-//   try {
-//     const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-//     if (response.data.status !== 404 && tableId !== response.data.table_id) {
-//       console.log('Order ID in cookie does not match the current table. Removing cookie...');
-//       const res = NextResponse.next();
-//       res.cookies.delete('orderId'); // ✅ ลบคุกกี้
-//       return res;
-//     }
-//   } catch (err) {
-//     console.error('Error fetching order status:', err);
-//   }
-// } 
 
 
 
