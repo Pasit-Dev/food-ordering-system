@@ -41,7 +41,7 @@ export default function Dashboard() {
         const revenue = paidOrders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
 
         // คำนวณจำนวนออเดอร์ทั้งหมด
-        const orderCount = orderData.length;
+        const orderCount = paidOrders.length;
 
         // // คำนวณเมนูที่ขายดีที่สุด
         // const menuCount = {};
