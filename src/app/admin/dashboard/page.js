@@ -180,7 +180,7 @@ export default function Dashboard() {
             <Card key={menu.menu_id}>
               <CardContent className="p-4">
                 <div className="text-center">
-                  <Image
+                  <img
                     src={menu.menu_image}
                     alt={menu.menu_name}
                     className="w-20 h-20 object-cover rounded-full mx-auto mb-2"
