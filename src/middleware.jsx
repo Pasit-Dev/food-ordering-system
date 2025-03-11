@@ -72,9 +72,13 @@ async function orderMiddleware(req) {
             } 
         }
       } else {
-        const nextUrl = new URL(url);
+        if (orderIdFromUrl) {
+          return NextResponse.next();
+        } else {
+          const nextUrl = new URL(url);
         nextUrl.searchParams.set('orderId', storedOrderId.value);
         return NextResponse.redirect(nextUrl);
+        }
       }
     } catch (err) {
       console.error("Error fetching order status:", err);
