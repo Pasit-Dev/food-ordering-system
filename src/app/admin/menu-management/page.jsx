@@ -112,7 +112,7 @@ export default function MenuManagement() {
           <div key={menu.menu_id} className="card bg-base-100 shadow-xl p-4">
             <img src={menu.image} alt={menu.menu_name} className="w-full h-40 object-cover rounded-lg mb-2" />
             <h2 className="text-lg text-black font-bold">{menu.menu_name}</h2>
-            <p className="text-gray-600">${menu.price}</p>
+            <p className="text-gray-600">฿{menu.price}</p>
             <span className={`badge ${menu.menu_status === "Available" ? "badge-success" : "badge-error"}`}>{menu.menu_status}</span>
             <div className="mt-2 flex gap-2">
               <button className="btn btn-warning btn-sm" onClick={() => { setEditingMenu(menu); setIsModalOpen(true); }}>Edit</button>
