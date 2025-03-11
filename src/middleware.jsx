@@ -46,40 +46,30 @@ async function orderMiddleware(req) {
         console.log("fetch table id stataus not 404", data, tableId);
         if (data.order_status == 'Not Paid') {
           console.log("order status is not paid") 
-        if (tableId == 'takeaway') {
-          if (data.table_id == null) {
-            console.log('takeaway -> takeaway');
+          if (tableId != 'takeaway' && tableId != data.table_id) {
+          if (data.table_id != null) {
+            console.log('table id -> table id');
             const nextUrl = new URL(url);
-            nextUrl.searchParams.set('tableId', "takeaway");
+            nextUrl.searchParams.set('tableId', data.table_id)
             nextUrl.searchParams.set('orderId', storedOrderId.value);
             const responseWithOldOrderId = NextResponse.redirect(nextUrl);
             return responseWithOldOrderId;
-          } else if (data.table_id != null) {
-            console.log('takeaway -> tableid');
-            const nextUrl = new URL(url);
-            nextUrl.searchParams.set('tableId', data.table_id);
-            nextUrl.searchParams.set('orderId', storedOrderId.value);
-            const responseWithOldOrderId = NextResponse.redirect(nextUrl);
-            return responseWithOldOrderId;
-          }
-        } else {
-          if (data.table_id != tableId && data.tableId != null) {
-              console.log('table id -> talbe id');
-          const nextUrl = new URL(url);
-          nextUrl.searchParams.set('tableId', data.table_id);
-          nextUrl.searchParams.set('orderId', storedOrderId.value);
-          const responseWithOldOrderId = NextResponse.redirect(nextUrl);
-          return responseWithOldOrderId;
-        } 
-          }
-          if (data.tableId == null && tableId != 'takeaway') {
-            console.log('table id -> takeaway');
+          } else if (data.table_id == null) {
+            console.log('tableid -> takeaway')
             const nextUrl = new URL(url);
             nextUrl.searchParams.set('tableId', 'takeaway');
             nextUrl.searchParams.set('orderId', storedOrderId.value);
             const responseWithOldOrderId = NextResponse.redirect(nextUrl);
             return responseWithOldOrderId;
           }
+          } else if (tableId == 'takeaway' && data.table_id != null) {
+            console.log('takeaway -> tableid')
+          const nextUrl = new URL(url);
+          nextUrl.searchParams.set('tableId', data.table_id);
+          nextUrl.searchParams.set('orderId', storedOrderId.value);
+          const responseWithOldOrderId = NextResponse.redirect(nextUrl);
+          return responseWithOldOrderId;
+            } 
         }
         // if (data.table_id != tableId) {
         //   console.log('table Id not matching!');
@@ -95,21 +85,6 @@ async function orderMiddleware(req) {
       console.error("Error fetching order status:", err);
     }
   }
-
-
-  // if (storedOrderId && tableId == 'takeaway') {
-  //   try {
-  //     const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-  //     const data = response.data;
-  //     if (data.status != 404) {
-  //       if (data.order_status == 'Not Paid') {
-  //         if ()
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error('Error check stored orderid in takeaway:', err);
-  //   }
-  // }
 
 
   if (tableId === 'takeaway') {
