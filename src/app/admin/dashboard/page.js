@@ -55,7 +55,7 @@ export default function Dashboard() {
         //   ? Object.entries(menuCount).sort((a, b) => b[1] - a[1])[0][0]
         //   : "N/A";
 
-        setOrders(orderData);
+        setOrders(paidOrders);
         setTotalRevenue(revenue);
         setTotalOrders(orderCount);
         // setBestSellingMenu(bestMenu);
