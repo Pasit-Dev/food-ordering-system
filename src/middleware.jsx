@@ -97,19 +97,19 @@ async function orderMiddleware(req) {
   }
 
 
-  if (storedOrderId && tableId == 'takeaway') {
-    try {
-      const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-      const data = response.data;
-      if (data.status != 404) {
-        if (data.order_status == 'Not Paid') {
-          if ()
-        }
-      }
-    } catch (err) {
-      console.error('Error check stored orderid in takeaway:', err);
-    }
-  }
+  // if (storedOrderId && tableId == 'takeaway') {
+  //   try {
+  //     const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+  //     const data = response.data;
+  //     if (data.status != 404) {
+  //       if (data.order_status == 'Not Paid') {
+  //         if ()
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error('Error check stored orderid in takeaway:', err);
+  //   }
+  // }
 
 
   if (tableId === 'takeaway') {
