@@ -173,6 +173,27 @@ async function orderMiddleware(req) {
       
       if (tableStatus === 'Available') {
         console.log('In Available')
+        if (storedOrderId) {
+          try {
+            console.log("found order id in cookie and check table id matching ")
+            const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+            const data = resposne.data;
+            console.log('fetching check table id matching ')
+            if (data.status != 404) {
+              console.log("fetch table id stataus not 404", data, tableId);
+              if (data.order_status == 'Not Paid') {
+                console.log("order status is not paid") 
+                const nextUrl = new URL(url);
+                  nextUrl.searchParams.set('tableId', data.table_id);
+                  nextUrl.searchParams.set('orderId', storedOrderId.value);
+                  const responseWithOldOrderId = NextResponse.redirect(nextUrl);
+                  return responseWithOldOrderId;
+              }
+            }
+          } catch (err) {
+            console.error("Error fetching order status:", err);
+          }
+        }
         if (orderIdFromUrl) {
           console.log("Have order id in URL")
           const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${orderIdFromUrl}`);
