@@ -79,6 +79,23 @@ export default function AddMenuModal({ onClose, onSave, editingMenu }) {
     }
   };
   
+  const handlePriceChange = (e, setValue) => {
+    const value = e.target.value;
+    // Only allow non-negative numbers (0 and above)
+    if (value === '' || parseFloat(value) >= 0) {
+      setValue(value);
+    }
+  };
+
+  const handleOptionPriceChange = (e, sectionIndex, optionIndex) => {
+    const value = e.target.value;
+    // Only allow non-negative numbers (0 and above)
+    if (value === '' || parseFloat(value) >= 0) {
+      const newSections = [...sections];
+      newSections[sectionIndex].options[optionIndex].additional_price = value;
+      setSections(newSections);
+    }
+  };
 
   const handleSubmit = () => {
     const formattedData = {
@@ -123,7 +140,8 @@ export default function AddMenuModal({ onClose, onSave, editingMenu }) {
                 placeholder="Price"
                 className="input input-bordered w-full"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => handlePriceChange(e, setPrice)}
+                min="0"
               />
               <select
                 className="select select-bordered w-full"
@@ -136,17 +154,16 @@ export default function AddMenuModal({ onClose, onSave, editingMenu }) {
             </div>
             <div className="mt-2 mb-2">
            <div className="relative w-full">
-  <input
-    type="file"
-    accept="image/*"
-    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-    onChange={handleImageUpload}
-  />
-  <button type="button" className="btn btn-outline flex items-center w-full py-6">
-    <Upload size={16} /> Upload Image
-  </button>
-</div>
-
+              <input
+                type="file"
+                accept="image/*"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                onChange={handleImageUpload}
+              />
+              <button type="button" className="btn btn-outline flex items-center w-full py-6">
+                <Upload size={16} /> Upload Image
+              </button>
+            </div>
 
               <div className="mt-12 w-full flex justify-center">
                 <img
@@ -235,11 +252,8 @@ export default function AddMenuModal({ onClose, onSave, editingMenu }) {
                           placeholder="Price"
                           className="input input-bordered w-20 max-w-md"
                           value={option.additional_price}
-                          onChange={(e) => {
-                            const newSections = [...sections];
-                            newSections[sectionIndex].options[optionIndex].additional_price = e.target.value;
-                            setSections(newSections);
-                          }}
+                          onChange={(e) => handleOptionPriceChange(e, sectionIndex, optionIndex)}
+                          min="0"
                         />
                         <select
                           className="select select-bordered w-20 max-w-md"

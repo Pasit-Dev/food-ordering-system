@@ -175,7 +175,8 @@ export default function TableItem({ table }) {
       <div className="bg-gray-50 p-4 flex justify-end gap-2">
         <button
           className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-none"
-          onClick={toggleEdit}
+          onClick={table.table_status !== 'Occupied' ? toggleEdit : null}
+          disabled={table.table_status === 'Occupied'}
         >
           Edit
         </button>
