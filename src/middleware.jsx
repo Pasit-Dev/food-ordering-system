@@ -43,7 +43,7 @@ async function orderMiddleware(req) {
       const data = resposne.data;
       console.log('fetching check table id matching ')
       if (data.status != 404) {
-        console.log("fetch table id stataus not 404", data)
+        console.log("fetch table id stataus not 404", data, tableId);
         if (data.order_Status == 'Not Paid' && data.table_id != tableId) {
           console.log('table Id not matching!');
           const nextUrl = new URL(url);
