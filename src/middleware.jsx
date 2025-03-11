@@ -174,8 +174,8 @@ async function orderMiddleware(req) {
             const orderStatus = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
             const { table_id, order_status } = orderStatus.data;
             console.log("Order Resposne ", orderStatus)
-            console.log("Order Status ", orderStatus.data.order_status)
-            if (orderStatus) {
+            console.log("Order Status ", order_status)
+            if (order_status != undefined || order_status != 'undefined') {
               if (order_status != 'Not Paid') {
                 const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
                 console.log("Delet order id in cookie")
