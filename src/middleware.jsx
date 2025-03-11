@@ -46,16 +46,50 @@ async function orderMiddleware(req) {
         console.log("fetch table id stataus not 404", data, tableId);
         if (data.order_status == 'Not Paid') {
           console.log("order status is not paid") 
-          if (data.table_id != tableId) {
-            console.log('table Id not matching!');
+        if (tableId == 'takeaway') {
+          if (data.table_id == null) {
+            console.log('takeaway -> takeaway');
+            const nextUrl = new URL(url);
+            nextUrl.searchParams.set('tableId', "takeaway");
+            nextUrl.searchParams.set('orderId', storedOrderId.value);
+            const responseWithOldOrderId = NextResponse.redirect(nextUrl);
+            return responseWithOldOrderId;
+          } else if (data.table_id != null) {
+            console.log('takeaway -> tableid');
             const nextUrl = new URL(url);
             nextUrl.searchParams.set('tableId', data.table_id);
             nextUrl.searchParams.set('orderId', storedOrderId.value);
             const responseWithOldOrderId = NextResponse.redirect(nextUrl);
             return responseWithOldOrderId;
           }
-          
+        } else {
+          if (data.table_id != tableId && data.tableId != null) {
+              console.log('table id -> talbe id');
+          const nextUrl = new URL(url);
+          nextUrl.searchParams.set('tableId', data.table_id);
+          nextUrl.searchParams.set('orderId', storedOrderId.value);
+          const responseWithOldOrderId = NextResponse.redirect(nextUrl);
+          return responseWithOldOrderId;
+        } 
+          }
+          if (data.tableId == null && tableId != 'takeaway') {
+            console.log('table id -> takeaway');
+            const nextUrl = new URL(url);
+            nextUrl.searchParams.set('tableId', 'takeaway');
+            nextUrl.searchParams.set('orderId', storedOrderId.value);
+            const responseWithOldOrderId = NextResponse.redirect(nextUrl);
+            return responseWithOldOrderId;
+          }
         }
+        // if (data.table_id != tableId) {
+        //   console.log('table Id not matching!');
+        //   const nextUrl = new URL(url);
+        //   nextUrl.searchParams.set('tableId', data.table_id);
+        //   nextUrl.searchParams.set('orderId', storedOrderId.value);
+        //   const responseWithOldOrderId = NextResponse.redirect(nextUrl);
+        //   return responseWithOldOrderId;
+        // }
+      //   }
       }
     } catch (err) {
       console.error("Error fetching order status:", err);
@@ -63,12 +97,26 @@ async function orderMiddleware(req) {
   }
 
 
+  if (storedOrderId && tableId == 'takeaway') {
+    try {
+      const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+      const data = response.data;
+      if (data.status != 404) {
+        if (data.order_status == 'Not Paid') {
+          if ()
+        }
+      }
+    } catch (err) {
+      console.error('Error check stored orderid in takeaway:', err);
+    }
+  }
+
 
   if (tableId === 'takeaway') {
     if (storedOrderId) {
       console.log('Takeaway has stored order id');
       const orderRes = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-      if (orderRes.data.order_status === 'Paid' || orderRes.data.order_status === 'Cancelled') {
+      if (orderRes.data.order_status != 'Not Paid') {
         const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
         response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
         return response;
@@ -79,7 +127,7 @@ async function orderMiddleware(req) {
           const orderStatus = resposne.data.order_status;
           if (orderStatus) {
             console.log("2222")
-            if (orderStatus === 'Paid' || orderStatus === 'Cancelled') {
+            if (orderStatus != 'Not Paid') {
               console.log('3333')
               const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
               response.cookies.set('orderId', '', { expires: new Date(0) }); // ✅ แก้ไขการลบ cookie
