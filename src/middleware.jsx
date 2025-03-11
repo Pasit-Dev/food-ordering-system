@@ -72,6 +72,7 @@ async function orderMiddleware(req) {
             } 
         }
       } else {
+        console.log("Why is else")
         if (orderIdFromUrl) {
           return NextResponse.next();
         } else {
