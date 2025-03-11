@@ -1,37 +1,77 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Line, Bar } from "react-chartjs-2";
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import { Card } from "./components/Card";
 import { CardContent } from "./components/CardContent";
-import { useState } from "react";
-import { Chart, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from "chart.js";
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 function Select({ value, onChange, children }) {
   return (
-    <select
-      className="p-2 border rounded-md"
-      value={value}
-      onChange={onChange}
-    >
+    <select className="p-2 border rounded-md" value={value} onChange={onChange}>
       {children}
     </select>
   );
 }
+
 export default function Dashboard() {
-  const [year, setYear] = useState("2024");
+  const [orders, setOrders] = useState([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [bestSellingMenu, setBestSellingMenu] = useState("N/A");
+
+  useEffect(() => {
+    // ข้อมูลที่ได้รับมา
+    const orderData = YOUR_JSON_DATA.orders; // แทนที่ YOUR_JSON_DATA ด้วยข้อมูล JSON ที่ได้มา
+
+    // คำนวณยอดขายรวมจากออเดอร์ที่จ่ายเงินแล้ว
+    const paidOrders = orderData.filter((order) => order.order_status === "Paid");
+    const revenue = paidOrders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
+
+    // คำนวณจำนวนออเดอร์ทั้งหมด
+    const orderCount = orderData.length;
+
+    // (ถ้ามีข้อมูลเมนู แก้ตรงนี้ให้หาว่าเมนูไหนขายดีที่สุด)
+    const bestMenu = "ยังไม่มีข้อมูล"; // แก้ตรงนี้เมื่อมีข้อมูลเมนู
+
+    setOrders(orderData);
+    setTotalRevenue(revenue);
+    setTotalOrders(orderCount);
+    setBestSellingMenu(bestMenu);
+  }, []);
+
+  // สร้างข้อมูลสำหรับกราฟ
+  const monthlyRevenue = Array(12).fill(0);
+  const monthlyOrders = Array(12).fill(0);
+
+  orders.forEach((order) => {
+    const month = new Date(order.order_date).getMonth(); // หาค่าเดือน (0-11)
+    monthlyRevenue[month] += parseFloat(order.total_amount);
+    monthlyOrders[month] += 1;
+  });
 
   const revenueData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
-        label: "Total Revenue",
-        data: [100, 200, 300, 500, 700, 800, 900, 1000, 400, 600, 700, 900],
+        label: "Total Revenue (฿)",
+        data: monthlyRevenue,
         backgroundColor: "rgba(59, 130, 246, 0.5)",
         borderColor: "rgba(59, 130, 246, 1)",
         borderWidth: 2,
-        tension: 0.5
+        tension: 0.5,
       },
     ],
   };
@@ -41,7 +81,7 @@ export default function Dashboard() {
     datasets: [
       {
         label: "Total Orders",
-        data: [500, 700, 400, 900, 600, 800, 1100, 1200, 900, 1000, 750, 850],
+        data: monthlyOrders,
         backgroundColor: "rgba(59, 130, 246, 0.7)",
         borderRadius: 5,
       },
@@ -50,33 +90,24 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen text-black">
-      {/* Year Selector */}
-      <div className="flex justify-end">
-        <Select value={year} onChange={(e) => setYear(e.target.value)}>
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
-          <option value="2022">2022</option>
-        </Select>
-      </div>
-
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-4">
             <h3 className="text-lg font-semibold">Total Revenue</h3>
-            <p className="text-2xl font-bold">฿130,800</p> {/* Changed $ to ฿ */}
+            <p className="text-2xl font-bold">฿{totalRevenue.toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <h3 className="text-lg font-semibold">Total Orders</h3>
-            <p className="text-2xl font-bold">100</p>
+            <p className="text-2xl font-bold">{totalOrders}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <h3 className="text-lg font-semibold">Best Selling Menu</h3>
-            <p className="text-2xl font-bold">ข้าวผัด</p>
+            <p className="text-2xl font-bold">{bestSellingMenu}</p>
           </CardContent>
         </Card>
       </div>
