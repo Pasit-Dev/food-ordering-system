@@ -36,21 +36,37 @@ async function orderMiddleware(req) {
     return NextResponse.redirect(new URL('/404', req.nextUrl.origin));
   }
 
-  // if table_id ของ order_id ใน cookie ไม่ตรงกับ tableId ของ url ให้ 1.delete cookie 
-  // ถ้า table_id ของ order_id ใน cookie ไม่ตรงกับ tableId ของ URL → ลบคุกกี้
-if (storedOrderId) {
-  try {
-    const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
-    if (response.data.status !== 404 && tableId !== response.data.table_id) {
-      console.log('Order ID in cookie does not match the current table. Removing cookie...');
-      const res = NextResponse.next();
-      res.cookies.delete('orderId'); // ✅ ลบคุกกี้
-      return res;
+  if (storedOrderId) {
+    try {
+      const resposne = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+      const data = resposne.data;
+      if (data.status != 404) {
+        if (data.order_Status == 'Not Paid' && data.table_id != tableId) {
+          const nextUrl = new URL(url);
+          nextUrl.searchParams.set('tableId', data.table_id);
+          nextUrl.searchParams.set('orderId', storedOrderId.value);
+          const responseWithOldOrderId = NextResponse.redirect(nextUrl);
+          return responseWithOldOrderId;
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching order status:", err);
     }
-  } catch (err) {
-    console.error('Error fetching order status:', err);
   }
-}
+
+// if (storedOrderId) {
+//   try {
+//     const response = await axios.get(`https://api.pasitlab.com/orders/status/${storedOrderId.value}`);
+//     if (response.data.status !== 404 && tableId !== response.data.table_id) {
+//       console.log('Order ID in cookie does not match the current table. Removing cookie...');
+//       const res = NextResponse.next();
+//       res.cookies.delete('orderId'); // ✅ ลบคุกกี้
+//       return res;
+//     }
+//   } catch (err) {
+//     console.error('Error fetching order status:', err);
+//   }
+// } 
 
 
 
