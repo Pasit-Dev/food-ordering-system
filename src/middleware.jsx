@@ -175,21 +175,25 @@ async function orderMiddleware(req) {
             const { table_id, order_status } = orderStatus.data;
             console.log("Order Resposne ", orderStatus)
             console.log("Order Status ", orderStatus.data.order_status)
-            if (order_status != 'Not Paid') {
-              const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
-              console.log("Delet order id in cookie")
-              response.cookies.delete('orderId');
-              return response;
+            if (orderStatus) {
+              if (order_status != 'Not Paid') {
+                const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
+                console.log("Delet order id in cookie")
+                response.cookies.delete('orderId');
+                return response;
+              } else {
+                // if (table_id == tableId) {
+                  const nextUrl = new URL(url)
+                nextUrl.searchParams.set('orderId', storedOrderId.value);
+                const responseWithNewOrderId = NextResponse.redirect(nextUrl);
+                return responseWithNewOrderId;
+                // } else {
+                //   // clear cookie and create create new order id 
+                // }
+  
+              }
             } else {
-              // if (table_id == tableId) {
-                const nextUrl = new URL(url)
-              nextUrl.searchParams.set('orderId', storedOrderId.value);
-              const responseWithNewOrderId = NextResponse.redirect(nextUrl);
-              return responseWithNewOrderId;
-              // } else {
-              //   // clear cookie and create create new order id 
-              // }
-
+              return NextResponse.redirect(new URL('/occupied', req.nextUrl.origin));
             }
           } else {
               
