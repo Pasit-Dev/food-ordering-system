@@ -27,14 +27,14 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const response = await fetch("https://api.pasitlab.com/orders/");
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const ordersResponse = await fetch("https://api.pasitlab.com/orders/");
+        if (!ordersResponse.ok) throw new Error(`HTTP error! Status: ${ordersResponse.status}`);
 
-        const data = await response.json();
-        
-        if (!data || !Array.isArray(data.orders)) throw new Error("Invalid data format received!");
+        const ordersData = await ordersResponse.json();
 
-        const orderData = data.orders;
+        if (!ordersData || !Array.isArray(ordersData.orders)) throw new Error("Invalid data format received!");
+
+        const orderData = ordersData.orders;
 
         // คำนวณยอดขายรวมจากออเดอร์ที่จ่ายเงินแล้ว
         const paidOrders = orderData.filter(order => order.order_status === "Paid");
@@ -43,30 +43,36 @@ export default function Dashboard() {
         // คำนวณจำนวนออเดอร์ทั้งหมด
         const orderCount = paidOrders.length;
 
-        // // คำนวณเมนูที่ขายดีที่สุด
-        // const menuCount = {};
-        // paidOrders.forEach(order => {
-        //   order.items.forEach(item => {
-        //     menuCount[item.name] = (menuCount[item.name] || 0) + item.quantity;
-        //   });
-        // });
-
-        // const bestMenu = Object.keys(menuCount).length > 0
-        //   ? Object.entries(menuCount).sort((a, b) => b[1] - a[1])[0][0]
-        //   : "N/A";
-
         setOrders(paidOrders);
         setTotalRevenue(revenue);
         setTotalOrders(orderCount);
-        // setBestSellingMenu(bestMenu);
-
       } catch (error) {
         console.error("Error fetching orders:", error);
         setOrders([]); // ตั้งค่าเริ่มต้นเป็นอาร์เรย์ว่างถ้ามีข้อผิดพลาด
       }
     }
 
+    async function fetchBestSellingMenu() {
+      try {
+        const response = await fetch("https://api.pasitlab.com/order-items/best-selling-menu");
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const data = await response.json();
+
+        if (data.best_selling_menus && data.best_selling_menus.length > 0) {
+          // เลือกเมนูที่ขายดีที่สุด
+          setBestSellingMenu(data.best_selling_menus[0].menu_name);
+        } else {
+          setBestSellingMenu("N/A");
+        }
+      } catch (error) {
+        console.error("Error fetching best selling menu:", error);
+        setBestSellingMenu("N/A");
+      }
+    }
+
     fetchOrders();
+    fetchBestSellingMenu();
   }, []);
 
   // สร้างข้อมูลสำหรับกราฟ
