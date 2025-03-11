@@ -175,7 +175,7 @@ async function orderMiddleware(req) {
             const { table_id, order_status } = orderStatus.data;
             console.log("Order Resposne ", orderStatus)
             console.log("Order Status ", order_status)
-            if (order_status != undefined || order_status != 'undefined' || order_status != null || order_status != 'null' || !order_status) {
+            if (orderStatus.data.status != 404) {
               console.log('order status is not undefined')
               if (order_status != 'Not Paid') {
                 const response = NextResponse.redirect(new URL('/404', req.nextUrl.origin));
