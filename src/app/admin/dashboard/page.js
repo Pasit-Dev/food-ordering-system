@@ -15,7 +15,7 @@ import {
 } from "chart.js";
 import { Card } from "./components/Card";
 import { CardContent } from "./components/CardContent";
-
+import Image from 'next/image';
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 export default function Dashboard() {
@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [bestSellingMenu, setBestSellingMenu] = useState("N/A");
+  const [topFiveMenus, setTopFiveMenus] = useState([]);
 
   useEffect(() => {
     async function fetchOrders() {
@@ -71,8 +72,27 @@ export default function Dashboard() {
       }
     }
 
+    async function fetchTopFiveMenus() {
+      try {
+        const response = await fetch("https://api.pasitlab.com/order-items/top-five-menu");
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const data = await response.json();
+
+        if (data.best_selling_menus && data.best_selling_menus.length > 0) {
+          setTopFiveMenus(data.best_selling_menus);
+        } else {
+          setTopFiveMenus([]);
+        }
+      } catch (error) {
+        console.error("Error fetching top five menus:", error);
+        setTopFiveMenus([]);
+      }
+    }
+
     fetchOrders();
     fetchBestSellingMenu();
+    fetchTopFiveMenus();
   }, []);
 
   // สร้างข้อมูลสำหรับกราฟ
@@ -150,6 +170,29 @@ export default function Dashboard() {
             <Bar data={ordersData} />
           </CardContent>
         </Card>
+      </div>
+
+      {/* Top Five Menus */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-4">Top Five Menus</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {topFiveMenus.map((menu) => (
+            <Card key={menu.menu_id}>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <Image
+                    src={menu.menu_image}
+                    alt={menu.menu_name}
+                    className="w-20 h-20 object-cover rounded-full mx-auto mb-2"
+                  />
+                  <h4 className="text-sm font-semibold">{menu.menu_name}</h4>
+                  <p className="text-xs text-gray-600">Total Sold: {menu.total_sold}</p>
+                  <p className="text-sm font-bold text-blue-600">฿{menu.menu_price}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );
