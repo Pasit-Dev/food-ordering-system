@@ -1,74 +1,150 @@
-import React, { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { format } from "date-fns";
-import { th } from "date-fns/locale";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Line, Bar } from "react-chartjs-2";
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Card } from "./components/Card";
+import { CardContent } from "./components/CardContent";
+
+Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 export default function Dashboard() {
   const [orders, setOrders] = useState([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
-  
+  const [bestSellingMenu, setBestSellingMenu] = useState("N/A");
+
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const response = await fetch("https://test-server-2mtj.onrender.com/orders");
+        const response = await fetch("https://api.pasitlab.com/orders/");
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
         const data = await response.json();
-        setOrders(data);
+        
+        if (!data || !Array.isArray(data.orders)) throw new Error("Invalid data format received!");
 
-        // คำนวณยอดขายรวมและจำนวนออเดอร์
-        let revenue = 0;
-        data.forEach(order => {
-          revenue += order.total_amount;
-        });
+        const orderData = data.orders;
 
+        // คำนวณยอดขายรวมจากออเดอร์ที่จ่ายเงินแล้ว
+        const paidOrders = orderData.filter(order => order.order_status === "Paid");
+        const revenue = paidOrders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
+
+        // คำนวณจำนวนออเดอร์ทั้งหมด
+        const orderCount = orderData.length;
+
+        // // คำนวณเมนูที่ขายดีที่สุด
+        // const menuCount = {};
+        // paidOrders.forEach(order => {
+        //   order.items.forEach(item => {
+        //     menuCount[item.name] = (menuCount[item.name] || 0) + item.quantity;
+        //   });
+        // });
+
+        // const bestMenu = Object.keys(menuCount).length > 0
+        //   ? Object.entries(menuCount).sort((a, b) => b[1] - a[1])[0][0]
+        //   : "N/A";
+
+        setOrders(orderData);
         setTotalRevenue(revenue);
-        setTotalOrders(data.length);
+        setTotalOrders(orderCount);
+        // setBestSellingMenu(bestMenu);
+
       } catch (error) {
         console.error("Error fetching orders:", error);
+        setOrders([]); // ตั้งค่าเริ่มต้นเป็นอาร์เรย์ว่างถ้ามีข้อผิดพลาด
       }
     }
 
     fetchOrders();
   }, []);
 
-  // แปลงข้อมูลออเดอร์ให้เป็นรูปแบบที่ใช้ในกราฟรายได้
-  const revenueData = orders.map(order => ({
-    date: format(new Date(order.order_date), "dd MMM yyyy", { locale: th }),
-    revenue: order.total_amount,
-  }));
+  // สร้างข้อมูลสำหรับกราฟ
+  const monthlyRevenue = Array(12).fill(0);
+  const monthlyOrders = Array(12).fill(0);
+
+  orders.forEach((order) => {
+    if (!order.order_date) return;
+    const month = new Date(order.order_date).getMonth();
+    monthlyRevenue[month] += parseFloat(order.total_amount);
+    monthlyOrders[month] += 1;
+  });
+
+  const revenueData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [
+      {
+        label: "Total Revenue (฿)",
+        data: monthlyRevenue,
+        backgroundColor: "rgba(59, 130, 246, 0.5)",
+        borderColor: "rgba(59, 130, 246, 1)",
+        borderWidth: 2,
+        tension: 0.5,
+      },
+    ],
+  };
+
+  const ordersData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [
+      {
+        label: "Total Orders",
+        data: monthlyOrders,
+        backgroundColor: "rgba(59, 130, 246, 0.7)",
+        borderRadius: 5,
+      },
+    ],
+  };
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <div className="grid grid-cols-2 gap-4">
+    <div className="p-6 space-y-6 bg-gray-50 min-h-screen text-black">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-4">
-            <h2 className="text-lg font-semibold">Total Revenue</h2>
-            <p className="text-xl font-bold">฿{totalRevenue.toLocaleString()}</p>
+            <h3 className="text-lg font-semibold">Total Revenue</h3>
+            <p className="text-2xl font-bold">฿{totalRevenue.toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <h2 className="text-lg font-semibold">Total Orders</h2>
-            <p className="text-xl font-bold">{totalOrders}</p>
+            <h3 className="text-lg font-semibold">Total Orders</h3>
+            <p className="text-2xl font-bold">{totalOrders}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="text-lg font-semibold">Best Selling Menu</h3>
+            <p className="text-2xl font-bold">{bestSellingMenu}</p>
           </CardContent>
         </Card>
       </div>
-      <Card>
-        <CardContent className="p-4">
-          <h2 className="text-lg font-semibold">Revenue Overview</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={revenueData}>
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="revenue" fill="#4CAF50" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="text-lg font-semibold mb-2">Total Revenue</h3>
+            <Line data={revenueData} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="text-lg font-semibold mb-2">Total Orders</h3>
+            <Bar data={ordersData} />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
