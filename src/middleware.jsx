@@ -72,13 +72,17 @@ async function orderMiddleware(req) {
             } 
         }
       } else {
-        console.log("Why is else")
-        if (orderIdFromUrl) {
-          return NextResponse.next();
+        if (tableId == 'takeaway') {
+          console.log("table id is takeaway:", tableId);
+          if (orderIdFromUrl) {
+            return NextResponse.next();
+          } else {
+            const nextUrl = new URL(url);
+          nextUrl.searchParams.set('orderId', storedOrderId.value);
+          return NextResponse.redirect(nextUrl);
+          }
         } else {
-          const nextUrl = new URL(url);
-        nextUrl.searchParams.set('orderId', storedOrderId.value);
-        return NextResponse.redirect(nextUrl);
+          console.log('table id is not takeaway', tableId);
         }
       }
     } catch (err) {
